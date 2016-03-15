@@ -72,6 +72,23 @@ public class OptionsList {
 	}
 	
 	/**
+	 * Get an option with given option code from the options list.
+	 * 
+	 * @param optionCode
+	 * 		  The option code of the searched option.
+	 * @return The searched option.
+	 * @throws IllegalArgumentException
+	 * 		   The option is not available in the list.
+	 */
+	public Option getOption(int optionCode) throws IllegalArgumentException {
+		for(Option option : getOptions()) {
+			if(option.getOptionCode() == optionCode)
+				return option;
+		}
+		throw new IllegalArgumentException("This option is not present in the list.");
+	}
+	
+	/**
 	 * @return The options of the options list.
 	 */
 	public Option[] getOptions() {
