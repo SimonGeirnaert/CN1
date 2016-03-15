@@ -56,8 +56,7 @@ public class DHCPClient {
 		Message requestResponse = DHCPRequest(discoverResponse.getXid(), discoverResponse.getYiaddr(), discoverResponse.getSiaddr(), socket);
 		System.out.println("Request response received.");
 		OptionsList options = requestResponse.getOptions();
-		Option[] optionsList = options.getOptions();
-		System.out.println("Lease time: " + optionsList.length);
+		System.out.println(options.getNumberOfOptions());
 		
 		socket.close();
 	}
