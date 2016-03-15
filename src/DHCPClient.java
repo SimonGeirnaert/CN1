@@ -13,14 +13,28 @@ import java.net.UnknownHostException;
  */
 public class DHCPClient {
 	
+	/**
+	 * Constant representing the MAC address of ...
+	 */
 	private static final String MAC_ADDRESS = "KD58AS96QM91LS95";
+	
+	/**
+	 * Constant representing the flag to receive the DHCPOFFER in broadcast
+	 */
 	private static final int FLAGS1 = 32768;
+	
+	/**
+	 * Constant representing the flag to receive the DHCPOFFER in unicast
+	 */
 	private static final int FLAGS0 = 0;
 	
+	/**
+	 * Variable representing the client IP address
+	 */
 	private InetAddress ciaddr = null;
 	
 	/**
-	 * 
+	 * Constructor.
 	 */
 	public DHCPClient(){
 		
@@ -41,6 +55,9 @@ public class DHCPClient {
 
 		Message requestResponse = DHCPRequest(discoverResponse.getXid(), discoverResponse.getYiaddr(), discoverResponse.getSiaddr(), socket);
 		System.out.println("Request response received.");
+		OptionsList options = requestResponse.getOptions();
+		Option[] optionsList = options.getOptions();
+		System.out.println("Lease time: " + optionsList.length);
 		
 		socket.close();
 	}
