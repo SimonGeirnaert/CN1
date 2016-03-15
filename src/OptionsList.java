@@ -87,5 +87,14 @@ public class OptionsList {
 	private void setOptions(Option[] options) {
 		this.options = options;
 	}
+	
+	/**
+	 * Return the number of options in the options list.
+	 * 
+	 * @return The number of options.
+	 */
+	public int getNumberOfOptions() {
+		return getOptions().length;
+	}
 
 }
