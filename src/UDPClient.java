@@ -16,17 +16,17 @@ import java.net.UnknownHostException;
 public class UDPClient {
 	
 	/**
-	 * Variable referencing the IP address of the local host.
+	 * Constant referencing the IP address of the local host.
 	 */
 	private static final String IP_SERVER = "10.33.14.246";	
 	
 	/**
-	 * Variable referencing the destination port number.
+	 * Constant referencing the destination port number.
 	 */
 	private static final int DESTINATION_PORT = 1234;
 	
 	/**
-	 * Variable referencing the packet size.
+	 * Constant referencing the packet size.
 	 */
 	private static final int PACKETSIZE = 512;
 	
