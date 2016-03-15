@@ -49,14 +49,14 @@ public class DHCPClient {
 	 */
 	public void getIP() throws IllegalArgumentException, SocketException, IOException{
 		DatagramSocket socket = new DatagramSocket();
-		Message discoverResponse = DHCPDiscover(socket);
+		Message offer = DHCPDiscover(socket);
 		System.out.println("Discover response received.");
-		System.out.println("Suggested IP: " + discoverResponse.getYiaddr().toString());
+		System.out.println("Suggested IP: " + offer.getYiaddr().toString());
 
-		Message requestResponse = DHCPRequest(discoverResponse.getXid(), discoverResponse.getYiaddr(), discoverResponse.getSiaddr(), socket);
+		Message acknowledge = DHCPRequest(offer.getXid(), offer.getYiaddr(), offer.getSiaddr(), socket);
 		System.out.println("Request response received.");
-		System.out.println("Server name: " + requestResponse.getSname());
-		OptionsList options = requestResponse.getOptions();
+		System.out.println(acknowledge == null);
+		OptionsList options = acknowledge.getOptions();
 		System.out.println(options.getNumberOfOptions());
 		
 		socket.close();
