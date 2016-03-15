@@ -55,6 +55,7 @@ public class DHCPClient {
 
 		Message requestResponse = DHCPRequest(discoverResponse.getXid(), discoverResponse.getYiaddr(), discoverResponse.getSiaddr(), socket);
 		System.out.println("Request response received.");
+		System.out.println("Server name: " + requestResponse.getSname());
 		OptionsList options = requestResponse.getOptions();
 		System.out.println(options.getNumberOfOptions());
 		
