@@ -13,12 +13,12 @@ import java.net.InetAddress;
 public class UDPServer {
 	
 	/**
-	 * Variable referencing the size of a package.
+	 * Constant referencing the size of a package.
 	 */
 	private static final int PACKAGESIZE = 512;
 	
 	/**
-	 * Variable referencing the port number of the datagram socket.
+	 * Constant referencing the port number of the datagram socket.
 	 */
 	private static final int PORT = 5001;
 	
