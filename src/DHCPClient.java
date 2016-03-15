@@ -14,7 +14,7 @@ import java.net.UnknownHostException;
 public class DHCPClient {
 	
 	/**
-	 * Constant representing the MAC address of ...
+	 * Constant representing the MAC address of the client
 	 */
 	private static final String MAC_ADDRESS = "KD58AS96QM91LS95";
 	
@@ -55,7 +55,7 @@ public class DHCPClient {
 
 		Message acknowledge = DHCPRequest(offer.getXid(), offer.getYiaddr(), offer.getSiaddr(), socket);
 		System.out.println("Request response received.");
-		System.out.println(acknowledge == null);
+		System.out.println(acknowledge.getXid());
 		OptionsList options = acknowledge.getOptions();
 		System.out.println(options.getNumberOfOptions());
 		
@@ -103,7 +103,7 @@ public class DHCPClient {
 		OptionsList optionsList = new OptionsList(option53, option50, option54);
 		
 		byte[] responseArray = new byte[512];
-		responseArray = sendUDPMessage(1,1,6,0, serverXid, 0, FLAGS1, ipNull, ipNull, ipNull, ipNull, MAC_ADDRESS, "", "", optionsList, socket);
+		responseArray = sendUDPMessage(1,1,6,0, serverXid, 0, FLAGS0, ipNull, ipNull, ipNull, ipNull, MAC_ADDRESS, "", "", optionsList, socket);
 		System.out.println("DHCPREQUEST sent to request IP " + offeredAddress.toString()+" at server " + serverAddress.toString());
 		return Message.convertToMessage(responseArray);	
 	}
