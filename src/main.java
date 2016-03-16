@@ -70,6 +70,8 @@ public class main {
 		DHCPClient client = new DHCPClient();
 		client.getIP();
 		
+		System.out.println("AANPASSING");
+		
 		
 //		DatagramSocket socket = new DatagramSocket();
 //		Message response = client.DHCPDiscover(socket);
