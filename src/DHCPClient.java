@@ -79,9 +79,11 @@ public class DHCPClient {
         
 		Option option53 = new Option(53, Utilities.convertToByteArray(1, 1));
 		Option option50 = new Option(50, InetAddress.getByName("0.0.0.0").getAddress());
+		byte[] option55byte = {0x01, 0x03, 0x0F, 0x06};
+		Option option55 = new Option(55, option55byte);
 		Option option57 = new Option(57, Utilities.convertToByteArray(2, 576));
 		Option option255  = new Option(255, new byte[0]);
-		OptionsList optionsList = new OptionsList(option53, option50, option57, option255);
+		OptionsList optionsList = new OptionsList(option53, option50, option55, option57, option255);
 		
 		System.out.println("DHCPDISCOVER sent");
 		return sendUDPMessage(1,1,6,0, Utilities.generateXid(), 0, FLAGS1, ipNull, ipNull, ipNull, ipNull, MAC_ADDRESS, "", "", optionsList, socket);
@@ -178,7 +180,7 @@ public class DHCPClient {
 	 */
 	private Message checkResponse(int xid, Message response, UDPClient client, DatagramSocket socket) throws UnknownHostException, UnsupportedEncodingException, IllegalArgumentException, IOException{
 		if(xid==response.getXid()){
-			System.out.println("Correct response received");
+			System.out.println("Correct response received.");
 			return response;
 		}
 		else{
