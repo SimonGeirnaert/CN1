@@ -1,0 +1,3 @@
+In terminal:
+git clone https://github.com/SimonGeirnaert/CN1.git
+git pull
