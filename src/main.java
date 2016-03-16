@@ -70,7 +70,6 @@ public class main {
 		DHCPClient client = new DHCPClient();
 		client.getIP();
 		
-		
 //		DatagramSocket socket = new DatagramSocket();
 //		Message response = client.DHCPDiscover(socket);
 //		
