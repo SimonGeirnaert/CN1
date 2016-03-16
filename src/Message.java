@@ -550,7 +550,7 @@ public class Message {
 		String chaddr = new String(Utilities.trimZeros(Utilities.getPartArray(28, 43, array)), "UTF-8");
 		String sname = new String(Utilities.trimZeros(Utilities.getPartArray(60, 123, array)), "UTF-8");
 		String file = new String(Utilities.trimZeros(Utilities.getPartArray(124, 251, array)), "UTF-8");
-		OptionsList options = OptionsList.returnOptionsList(Utilities.getPartArray(256, MESSAGE_SIZE-1, array));
+		OptionsList options = OptionsList.returnOptionsList(Utilities.getPartArray(MESSAGE_SIZE - 256, MESSAGE_SIZE-1, array));
 		Message message = new Message(op, htype, hlen, hops, xid, secs, flags, ciaddr, yiaddr, siaddr, giaddr, chaddr, sname, file, options);
 		return message;
 	}
