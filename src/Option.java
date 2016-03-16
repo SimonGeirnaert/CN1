@@ -37,9 +37,9 @@ public class Option {
 	 * @return The byte representation of an option as used in a DHCP message.
 	 */
 	public byte[] returnBytes(){
-		byte[] result = new byte[2+getLength()];
+		byte[] result = new byte[2+getLengthContent()];
 		result[0] = Utilities.convertToByteArray(1, getOptionCode())[0];
-		result[1] = Utilities.convertToByteArray(1, getLength())[0];
+		result[1] = Utilities.convertToByteArray(1, getLengthContent())[0];
 		return Utilities.insertSubArrayInArrayAt(getContents(), result, 2);
 	}
 	
@@ -77,7 +77,7 @@ public class Option {
 	/**
 	 * @return The length of the contents of the option.
 	 */
-	public int getLength() {
+	public int getLengthContent() {
 		return getContents().length;
 	}
 

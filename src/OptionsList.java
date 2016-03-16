@@ -30,7 +30,7 @@ public class OptionsList {
 		int i = 0;
 		for(Option option: getOptions()){
 			Utilities.insertSubArrayInArrayAt(option.returnBytes(), result, i);
-			i = i + 2 + option.getLength();
+			i = i + 2 + option.getLengthContent();
 		}
 		return result;
 	}
@@ -51,7 +51,7 @@ public class OptionsList {
 			else {
 				Option option = Option.returnOptionAtIndex(bytes, index);
 				result.addOption(option);
-				index = index + option.getLength() + 2;
+				index = index + option.getLengthContent() + 2;
 			}
 		}
 		return result;
