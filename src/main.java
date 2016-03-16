@@ -69,6 +69,7 @@ public class main {
 		
 		DHCPClient client = new DHCPClient();
 		client.getIP();
+		System.out.println("mlkj");
 		
 		
 //		DatagramSocket socket = new DatagramSocket();
