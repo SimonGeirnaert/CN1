@@ -26,7 +26,7 @@ public class OptionsList {
 	 * @return The byte representation of the options as used in a DHCP message.
 	 */
 	public byte[] returnBytes(){
-		byte[] result = new byte[Message.MESSAGE_SIZE-256];
+		byte[] result = new byte[Message.MESSAGE_SIZE-240];
 		int i = 0;
 		for(Option option: getOptions()){
 			Utilities.insertSubArrayInArrayAt(option.returnBytes(), result, i);

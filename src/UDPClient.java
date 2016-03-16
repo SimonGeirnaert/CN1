@@ -38,8 +38,12 @@ public class UDPClient {
 
 	/**
 	 * Send data to UDP server.
+	 * 
 	 * @param sendData
 	 * 		  Data packet to be sent to the UDP server.
+	 * @param socket
+	 *        The DatagramSocket currently in use
+	 * 
 	 * @throws UnknownHostException
 	 * 		   InetAddress.getByName() can't find a host for the given hostname.
 	 * @throws IOException
@@ -59,6 +63,31 @@ public class UDPClient {
 		socket.send(sendPacket);
 		//System.out.println("packet sent");
 		return waitForAndReturnResponse(socket);
+	}
+	
+	/**
+	 * Send data to UDP server without receiving a response.
+	 * 
+	 * @param sendData
+	 * 		  Data packet to be sent to the UDP server.
+	 * @param socket
+	 *        The DatagramSocket currently in use
+	 *        
+	 * @throws UnknownHostException
+	 * 		   InetAddress.getByName() can't find a host for the given hostname.
+	 * @throws IOException
+	 * 		   socket.send() or socket.receive() encountered an error with the IO.
+	 * @throws SocketException
+	 *         The construction of the DatagramSocket has failed.
+	 */
+	public void sendDataWithoutResponse(byte[] sendData, DatagramSocket socket) throws UnknownHostException, IOException {
+		
+		// Send packet
+		InetAddress IPAddress = InetAddress.getByName(IP_SERVER);
+		//System.out.println(IPAddress);
+		DatagramPacket sendPacket = new DatagramPacket(sendData, PACKETSIZE, IPAddress, DESTINATION_PORT);
+		socket.send(sendPacket);
+
 	}
 	
 	/**

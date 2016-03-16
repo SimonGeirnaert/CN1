@@ -521,11 +521,11 @@ public class Message {
 		byteArray = Utilities.insertSubArrayInArrayAt(getSiaddr().getAddress(), byteArray, 20);
 		byteArray = Utilities.insertSubArrayInArrayAt(getGiaddr().getAddress(), byteArray, 24);
 		byteArray = Utilities.insertSubArrayInArrayAt(getChaddr().getBytes(), byteArray, 28);
-		byteArray = Utilities.insertSubArrayInArrayAt(new byte[16], byteArray, 44);
-		byteArray = Utilities.insertSubArrayInArrayAt(getSname().getBytes(), byteArray, 60);
-		byteArray = Utilities.insertSubArrayInArrayAt(getFile().getBytes(), byteArray, 124);
-		byteArray = Utilities.insertSubArrayInArrayAt(getCookie(), byteArray, 252);
-		byteArray = Utilities.insertSubArrayInArrayAt(getOptions().returnBytes(), byteArray, 256);
+		//byteArray = Utilities.insertSubArrayInArrayAt(new byte[16], byteArray, 44);
+		byteArray = Utilities.insertSubArrayInArrayAt(getSname().getBytes(), byteArray, 44);
+		byteArray = Utilities.insertSubArrayInArrayAt(getFile().getBytes(), byteArray, 108);
+		byteArray = Utilities.insertSubArrayInArrayAt(getCookie(), byteArray, 236);
+		byteArray = Utilities.insertSubArrayInArrayAt(getOptions().returnBytes(), byteArray, 240);
 
 		return byteArray;
 	}
@@ -548,9 +548,9 @@ public class Message {
 		InetAddress siaddr = InetAddress.getByAddress(Utilities.getPartArray(20, 23, array));
 		InetAddress giaddr = InetAddress.getByAddress(Utilities.getPartArray(24, 27, array));
 		String chaddr = new String(Utilities.trimZeros(Utilities.getPartArray(28, 43, array)), "UTF-8");
-		String sname = new String(Utilities.trimZeros(Utilities.getPartArray(60, 123, array)), "UTF-8");
-		String file = new String(Utilities.trimZeros(Utilities.getPartArray(124, 251, array)), "UTF-8");
-		OptionsList options = OptionsList.returnOptionsList(Utilities.getPartArray(256, MESSAGE_SIZE-1, array));
+		String sname = new String(Utilities.trimZeros(Utilities.getPartArray(44, 107, array)), "UTF-8");
+		String file = new String(Utilities.trimZeros(Utilities.getPartArray(108, 235, array)), "UTF-8");
+		OptionsList options = OptionsList.returnOptionsList(Utilities.getPartArray(240, MESSAGE_SIZE-1, array));
 		Message message = new Message(op, htype, hlen, hops, xid, secs, flags, ciaddr, yiaddr, siaddr, giaddr, chaddr, sname, file, options);
 		return message;
 	}
