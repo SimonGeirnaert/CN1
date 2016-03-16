@@ -52,6 +52,7 @@ public class DHCPClient {
 		Message offer = DHCPDiscover(socket);
 		System.out.println("Discover response received.");
 		System.out.println("Suggested IP: " + offer.getYiaddr().toString());
+		System.out.println("Options offer: " + offer.getOptions().getNumberOfOptions());
 
 		Message acknowledge = DHCPRequest(offer.getXid(), offer.getYiaddr(), offer.getSiaddr(), socket);
 		System.out.println("Request response received.");
