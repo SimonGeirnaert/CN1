@@ -84,7 +84,7 @@ public class DHCPClient {
 		Option option57 = new Option(57, Utilities.convertToByteArray(2, 576));
 		Option option255  = new Option(255, new byte[0]);
 		OptionsList optionsList = new OptionsList(option53, option50, option55, option57, option255);
-		System.out.println("Option 255 is zo groot: " option255.getLength());
+		System.out.println("Option 255 is zo groot: " + option255.getLength());
 		System.out.println("Onze options list is zo groot: " + optionsList.getNumberOfOptions());
 		
 		System.out.println("DHCPDISCOVER sent");
