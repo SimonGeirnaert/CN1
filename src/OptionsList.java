@@ -62,7 +62,7 @@ public class OptionsList {
 	 * 
 	 * @param option The option to add.
 	 */
-	public void addOption(Option option){
+	private void addOption(Option option){
 		Option[] newList = new Option[getOptions().length+1];
 		for(int i = 0; i<getOptions().length; i++){
 			newList[i] = getOptions()[i];
@@ -78,7 +78,7 @@ public class OptionsList {
 	 * 		  The option code of the searched option.
 	 * @return The searched option.
 	 * @throws IllegalArgumentException
-	 * 		   The option is not available in the list.
+	 * 		   The option is not available in the list
 	 */
 	public Option getOption(int optionCode) throws IllegalArgumentException {
 		for(Option option : getOptions()) {
@@ -112,6 +112,21 @@ public class OptionsList {
 	 */
 	public int getNumberOfOptions() {
 		return getOptions().length;
+	}
+	
+	/**
+	 * Return the option at a given index of the option list.
+	 * 
+	 * @param index
+	 * 		  The index of the searched option.
+	 * @return The option associated with the given index.
+	 * @throws IndexOutOfBoundsException
+	 * 		   The given index is not positive or it exceeds the number of options in the list.
+	 */
+	public Option getOptionAt(int index) throws IndexOutOfBoundsException {
+		if(index < 0 || index > getNumberOfOptions() - 1)
+			throw new IndexOutOfBoundsException();
+		return getOptions()[index];
 	}
 
 }
