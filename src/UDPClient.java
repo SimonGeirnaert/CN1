@@ -28,7 +28,7 @@ public class UDPClient {
 	/**
 	 * Constant referencing the packet size.
 	 */
-	private static final int PACKETSIZE = 512;
+	private static final int PACKETSIZE = 576;
 	
 	/**
 	 * Initialize the new UPD client.
