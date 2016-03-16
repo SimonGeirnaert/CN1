@@ -1,3 +1,13 @@
 In terminal:
 git clone https://github.com/SimonGeirnaert/CN1.git
 git pull
+
+renew/rebind: http://www.tcpipguide.com/free/t_DHCPLeaseLifeCycleOverviewAllocationReallocationRe.htm
+
+DHCP Client
+- Kan nog geen DHCPNACK verwerken als antwoord op een DHCPREQUEST
+- rebind() moet nog geschreven worden
+- timers inbouwen
+
+DHCP Server
+- Alles
