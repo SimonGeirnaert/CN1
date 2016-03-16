@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
@@ -49,8 +50,9 @@ public class DHCPClient {
 	 */
 	public void getIP() throws IllegalArgumentException, SocketException, IOException{
 		DatagramSocket socket = new DatagramSocket();
+		
 		Message offer = DHCPDiscover(socket);
-		System.out.println("Discover response received.");
+		System.out.println("Discover response (DHCPOFFER) received.");
 		System.out.println("Suggested IP: " + offer.getYiaddr().toString());
 
 		Message acknowledge = DHCPRequest(offer.getXid(), offer.getYiaddr(), offer.getSiaddr(), socket);
@@ -76,12 +78,12 @@ public class DHCPClient {
         
 		Option option53 = new Option(53, Utilities.convertToByteArray(1, 1));
 		Option option50 = new Option(50, InetAddress.getByName("0.0.0.0").getAddress());
-		OptionsList optionsList = new OptionsList(option53, option50);
+		Option option57 = new Option(57, Utilities.convertToByteArray(2, 576));
+		Option option255  = new Option(255, new byte[0]);
+		OptionsList optionsList = new OptionsList(option53, option50, option57, option255);
 		
-		byte[] responseArray = new byte[512];
-		responseArray = sendUDPMessage(1,1,6,0, Utilities.generateXid(), 0, FLAGS1, ipNull, ipNull, ipNull, ipNull, MAC_ADDRESS, "", "", optionsList, socket);
 		System.out.println("DHCPDISCOVER sent");
-		return Message.convertToMessage(responseArray);
+		return sendUDPMessage(1,1,6,0, Utilities.generateXid(), 0, FLAGS1, ipNull, ipNull, ipNull, ipNull, MAC_ADDRESS, "", "", optionsList, socket);
 	}
 	
 	/**
@@ -101,14 +103,12 @@ public class DHCPClient {
 		Option option54 = new Option(54, serverAddress.getAddress());
 		OptionsList optionsList = new OptionsList(option53, option50, option54);
 		
-		byte[] responseArray = new byte[512];
-		responseArray = sendUDPMessage(1,1,6,0, serverXid, 0, FLAGS1, ipNull, ipNull, ipNull, ipNull, MAC_ADDRESS, "", "", optionsList, socket);
 		System.out.println("DHCPREQUEST sent to request IP " + offeredAddress.toString()+" at server " + serverAddress.toString());
-		return Message.convertToMessage(responseArray);	
+		return sendUDPMessage(1,1,6,0, serverXid, 0, FLAGS1, ipNull, ipNull, ipNull, ipNull, MAC_ADDRESS, "", "", optionsList, socket);
 	}
 
 	/**
-	 * Creates a UDP message in DHCP format with all given fields
+	 * Creates a UDP message in DHCP format with all given fields and sends it to the server.
 	 * 
 	 * @param op
 	 *        The opcode for the message.
@@ -143,15 +143,45 @@ public class DHCPClient {
 	 * @param options
 	 *        The options for the message.
 	 * 
-	 * @return The answer from the server as a byte array.
+	 * @return The answer from the server as a message.
 	 * 
 	 * @throws UnknownHostException
 	 * @throws SocketException
 	 * @throws IOException
 	 */
-	private byte[] sendUDPMessage(int op, int htype, int hlen, int hops, int xid, int secs, int flags, InetAddress ciaddr, InetAddress yiaddr, InetAddress siaddr, InetAddress giaddr, String chaddr, String sname, String file, OptionsList options, DatagramSocket socket) throws UnknownHostException, SocketException, IOException {
+	private Message sendUDPMessage(int op, int htype, int hlen, int hops, int xid, int secs, int flags, InetAddress ciaddr, InetAddress yiaddr, InetAddress siaddr, InetAddress giaddr, String chaddr, String sname, String file, OptionsList options, DatagramSocket socket) throws UnknownHostException, SocketException, IOException {
 		UDPClient client = new UDPClient();
 		Message m = new Message(op, htype, hlen, hops, xid, secs, flags, ciaddr, yiaddr, siaddr, giaddr, chaddr, sname, file, options);
-		return client.sendData(m.convertToByteArray(), socket);
+		Message response = Message.convertToMessage(client.sendData(m.convertToByteArray(), socket));
+		return checkResponse(xid, response, client, socket);
+	}
+	
+	/**
+	 * Checks if the response received is the correct response. If not, waits for the correct response to return.
+	 * 
+	 * @param xid
+	 *        The transaction ID of the message sent by the client to compare with the transaction ID of the received message.
+	 * @param response
+	 *        The response received from the server.
+	 * @param client
+	 *        The UDP client currently in use.
+	 * @param socket
+	 *        The DatagramSocket currently in use.
+	 *        
+	 * @return The correct reply from the server.
+	 * 
+	 * @throws UnknownHostException
+	 * @throws UnsupportedEncodingException
+	 * @throws IllegalArgumentException
+	 * @throws IOException
+	 */
+	private Message checkResponse(int xid, Message response, UDPClient client, DatagramSocket socket) throws UnknownHostException, UnsupportedEncodingException, IllegalArgumentException, IOException{
+		if(xid==response.getXid()){
+			System.out.println("Correct response received");
+			return response;
+		}
+		else{
+			return checkResponse(xid, Message.convertToMessage(client.waitForAndReturnResponse(socket)), client, socket);
+		}
 	}
 }

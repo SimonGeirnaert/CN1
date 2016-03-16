@@ -33,6 +33,11 @@ public class Message {
 		setOptions(options);
 	}
 	
+	/**
+	 * Variable referencing the size of a message.
+	 */
+	public static final int MESSAGE_SIZE = 576;
+	
 	/**********************************************************
 	 * OpCode
 	 **********************************************************/
@@ -503,7 +508,7 @@ public class Message {
 	 * @return The byte array matching this message.
 	 */
 	public byte[] convertToByteArray() {
-		byte[] byteArray = new byte[512];
+		byte[] byteArray = new byte[MESSAGE_SIZE];
 		byteArray[0] = Utilities.convertToByteArray(1, getOp())[0];
 		byteArray[1] = Utilities.convertToByteArray(1, getHtype())[0];
 		byteArray[2] = Utilities.convertToByteArray(1, getHlen())[0];
@@ -545,7 +550,7 @@ public class Message {
 		String chaddr = new String(Utilities.trimZeros(Utilities.getPartArray(28, 43, array)), "UTF-8");
 		String sname = new String(Utilities.trimZeros(Utilities.getPartArray(60, 123, array)), "UTF-8");
 		String file = new String(Utilities.trimZeros(Utilities.getPartArray(124, 251, array)), "UTF-8");
-		OptionsList options = OptionsList.returnOptionsList(Utilities.getPartArray(256, 511, array));
+		OptionsList options = OptionsList.returnOptionsList(Utilities.getPartArray(256, MESSAGE_SIZE-1, array));
 		Message message = new Message(op, htype, hlen, hops, xid, secs, flags, ciaddr, yiaddr, siaddr, giaddr, chaddr, sname, file, options);
 		return message;
 	}
