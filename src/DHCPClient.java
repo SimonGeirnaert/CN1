@@ -54,12 +54,12 @@ public class DHCPClient {
 		Message offer = DHCPDiscover(socket);
 		System.out.println("Discover response (DHCPOFFER) received.");
 		System.out.println("Suggested IP: " + offer.getYiaddr().toString());
-		System.out.println("Options offer: " + offer.getOptions().getNumberOfOptions());
+		System.out.println("Length options offer: " + offer.getOptions().getNumberOfOptions());
 
 		Message acknowledge = DHCPRequest(offer.getXid(), offer.getYiaddr(), offer.getSiaddr(), socket);
 		System.out.println("Request response received.");
 		OptionsList options = acknowledge.getOptions();
-		System.out.println(options.getOption(53));
+//		System.out.println(options.getOption(53));
 		
 		socket.close();
 	}
