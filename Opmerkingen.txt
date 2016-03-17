@@ -16,4 +16,6 @@ DHCP Server
 	     - wistjedatje: per combinatie van question-response moet xid zelfde zijn, niet ertussen
 	     - rebinden achterwege laten (Hannes doet ook niet): kunnen we ook niet echt doen
 	     - MAC_ADDRESS misschien gewoon als variabele en meegeven in constructor?
+	     - siaddr weg wat niet nuttig als variable van DHCPClient (werd ook nergens echt gebruikt, enkel voor renewal, maar toch enkel in getIP() en daar weet je alles over serverip
+	     - leasetime weg als variabele, want niet nuttig, geeft ook geen info
 		

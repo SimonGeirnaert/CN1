@@ -15,4 +15,5 @@ DHCP Server
 *DHCPClient: - checkResponseOption?
 	     - wistjedatje: per combinatie van question-response moet xid zelfde zijn, niet ertussen
 	     - rebinden achterwege laten (Hannes doet ook niet): kunnen we ook niet echt doen
+	     - MAC_ADDRESS misschien gewoon als variabele en meegeven in constructor?
 		

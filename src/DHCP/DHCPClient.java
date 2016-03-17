@@ -49,34 +49,7 @@ public class DHCPClient {
 	private void setCiaddr(InetAddress ciaddr) {
 		this.ciaddr = ciaddr;
 	}
-	
-	
-	/**********************************************************
-	 * Lease time
-	 **********************************************************/
-	
 
-	/**
-	 * Variable representing the lease time (in seconds) issued by the DHCP server.
-	 */
-	private int leaseTime = 0;
-	
-	/**
-	 * @return The lease time given by the server.
-	 */
-	public int getLeaseTime() {
-		return leaseTime;
-	}
-
-	/**
-	 * Sets the lease time given by the server.
-	 * 
-	 * @param leaseTime
-	 *        The lease time to set.
-	 */
-	private void setLeaseTime(int leaseTime) {
-		this.leaseTime = leaseTime;
-	}
 	
 	/**********************************************************
 	 * Constructor
@@ -114,22 +87,19 @@ public class DHCPClient {
 		
 			setCiaddr(acknowledge.getYiaddr());
 			System.out.println("SYSTEM IP SET TO " + getCiaddr().toString());
-			setLeaseTime(Utilities.convertToInt(acknowledge.getOptions().getOption(51).getContents()));
 			int leaseTime = Utilities.convertToInt(acknowledge.getOptions().getOption(51).getContents());
 			System.out.println("- Lease time: " + leaseTime + " seconds.");
+			socket.close();
+			long timeBeginLease = System.currentTimeMillis();
+			while(System.currentTimeMillis() - timeBeginLease < 0.5*leaseTime*1000){}
+			renewLease(acknowledge.getSiaddr());
 		}
 		else {
 			// Restart the configuration if NACK received
 			System.out.println("DCHPNACK received. Restarting the configuration.");
+			socket.close();
 			getIP();
 		}
-		
-		long timeBeginLease = System.currentTimeMillis();
-		
-		socket.close();
-		
-		while(System.currentTimeMillis() - timeBeginLease < 0.5*leaseTime*1000){}
-		renewLease(acknowledge.getSiaddr());
 	}
 	
 	/**
@@ -164,7 +134,6 @@ public class DHCPClient {
 		Message ack = DHCPRequest(Utilities.generateXid(), getCiaddr(), siaddr, client, socket);
 		setCiaddr(ack.getYiaddr());
 		System.out.println("LEASE RENEWAL COMPLETE, SYSTEM IP SET TO "+ getCiaddr().toString());
-		setLeaseTime(Utilities.convertToInt(ack.getOptions().getOption(51).getContents()));
 		System.out.println("- Lease time: "+Utilities.convertToInt(ack.getOptions().getOption(51).getContents())+" seconds.");
 		
 		socket.close();
