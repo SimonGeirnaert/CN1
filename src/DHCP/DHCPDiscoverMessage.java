@@ -18,12 +18,12 @@ public class DHCPDiscoverMessage extends Message {
 	private static final int FLAGS1 = 32768;
 	
 	/**
-	 * Intialize the new DHCP discover message with given MAC address
+	 * Initialize the new DHCP discover message with given MAC address
 	 * 
 	 * @param macAddress
 	 * 		  The MAC Address of the client.
-	 * @throws IllegalArgumentException
-	 * @throws UnknownHostException
+	 * @effect The DHCP discover message is a message with standard fields and given MAC address and standard
+	 * 		   options for a discover message.
 	 */
 	public DHCPDiscoverMessage(String macAddress) throws IllegalArgumentException, UnknownHostException {
 		super(1,1,6,0, Utilities.generateXid(), 0, FLAGS1, InetAddress.getByName("0.0.0.0"), InetAddress.getByName("0.0.0.0"), InetAddress.getByName("0.0.0.0"), InetAddress.getByName("0.0.0.0"), macAddress, "", "", null);

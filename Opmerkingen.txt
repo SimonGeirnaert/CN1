@@ -18,4 +18,11 @@ DHCP Server
 	     - MAC_ADDRESS misschien gewoon als variabele en meegeven in constructor?
 	     - siaddr weg wat niet nuttig als variable van DHCPClient (werd ook nergens echt gebruikt, enkel voor renewal, maar toch enkel in getIP() en daar weet je alles over serverip
 	     - leasetime weg als variabele, want niet nuttig, geeft ook geen info
+	     - misschien returns voor getIp() of/en renewIP()?
+	     - wat te doen als NACK op renew?
+	     - checkResponseOption hebben we niet nodig, op de ACK/NACK wordt in getIp() getest en voor offer is het niet nodig (en zoja, dan moet dat in getIp en niet in DHCPDiscover -> geeft enkel antwoord terug zonder erover te oordelen.
+
+Algemeen voor setters en constructoren: eens kijken naar precondities?
+
+- Commentaar bij grote methodes van message plaatsen. + posts in constructor
 		

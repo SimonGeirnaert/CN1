@@ -59,6 +59,8 @@ public class Option {
 	}
 	
 	/**
+	 * Return the option code of the option.
+	 * 
 	 * @return The code identifying the option.
 	 */
 	public int getOptionCode() {
@@ -76,6 +78,8 @@ public class Option {
 	}
 
 	/**
+	 * Return the length of the content of the option.
+	 * 
 	 * @return The length of the contents of the option.
 	 */
 	public int getLengthContent() {

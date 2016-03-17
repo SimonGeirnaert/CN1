@@ -17,7 +17,7 @@ public class DHCPRequestMessage extends Message {
 	private static final int FLAGS1 = 32768;
 	
 	/**
-	 * Intialize the new DHCP request message with given transaction ID, MAC address, offered address and server address.
+	 * Initialize the new DHCP request message with given transaction ID, MAC address, offered address and server address.
 	 * 
 	 * @param transactionID
 	 * 		  The transaction ID of the messages.
@@ -27,8 +27,8 @@ public class DHCPRequestMessage extends Message {
 	 * 		  The offered address, received from the server.
 	 * @param serverAddress
 	 * 	      The IP address of the server.
-	 * @throws IllegalArgumentException
-	 * @throws UnknownHostException
+	 * @effect The DHCP request message is a message with standard fields, given transaction ID, MAC address,
+	 * 		   offered address, server address and standard options for a request message.
 	 */
 	public DHCPRequestMessage(int transactionID, String macAddress, InetAddress offeredAddress, InetAddress serverAddress) throws IllegalArgumentException, UnknownHostException {
 		super(1,1,6,0, transactionID, 0, FLAGS1, InetAddress.getByName("0.0.0.0"), InetAddress.getByName("0.0.0.0"), InetAddress.getByName("0.0.0.0"), InetAddress.getByName("0.0.0.0"), macAddress, "", "", null);

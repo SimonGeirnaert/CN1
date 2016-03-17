@@ -57,9 +57,11 @@ public class DHCPClient {
 
 	/**
 	 * Initialize the new DHCPClient
+	 * 
+	 * @post The client has no IP address.
 	 */
 	public DHCPClient(){
-		
+		this.setCiaddr(null);
 	}
 	
 	/**********************************************************
@@ -67,35 +69,39 @@ public class DHCPClient {
 	 **********************************************************/
 	
 	/**
-	 * Gets an IP for the client.
+	 * Gets an IP for the client. If the lease time for the IP address is expired, renewing the lease.
 	 * 
-	 * @throws IllegalArgumentException
-	 * @throws SocketException
-	 * @throws IOException
 	 */
 	public void getIP() throws IllegalArgumentException, SocketException, IOException{
+		// Initialize connection sockets and settings
 		DatagramSocket socket = new DatagramSocket();
 		UDPClient client = new UDPClient();
 		
+		// Discover
 		Message offer = DHCPDiscover(client, socket);
 		System.out.println("DHCPOFFER received.");
 		System.out.println("- Suggested IP: " + offer.getYiaddr().toString());
 
+		// Request
 		Message acknowledge = DHCPRequest(offer.getXid(), offer.getYiaddr(), offer.getSiaddr(), client, socket);
+		
+		// Acknowledge received and waiting till lease expired to renew
 		if(Utilities.convertToInt(acknowledge.getOptions().getOption(53).getContents()) == 5) {
 			System.out.println("DHCPACK received.");
 		
 			setCiaddr(acknowledge.getYiaddr());
 			System.out.println("SYSTEM IP SET TO " + getCiaddr().toString());
-			int leaseTime = Utilities.convertToInt(acknowledge.getOptions().getOption(51).getContents());
+//			int leaseTime = Utilities.convertToInt(acknowledge.getOptions().getOption(51).getContents());
+			int leaseTime = 10; //to simulate lease time of 10 seconds
 			System.out.println("- Lease time: " + leaseTime + " seconds.");
 			socket.close();
 			long timeBeginLease = System.currentTimeMillis();
 			while(System.currentTimeMillis() - timeBeginLease < 0.5*leaseTime*1000){}
 			renewLease(acknowledge.getSiaddr());
 		}
+		
+		// Negative acknowledge received, reconfiguration
 		else {
-			// Restart the configuration if NACK received
 			System.out.println("DCHPNACK received. Restarting the configuration.");
 			socket.close();
 			getIP();
@@ -105,8 +111,7 @@ public class DHCPClient {
 	/**
 	 * Releases the IP address of the client.
 	 * 
-	 * @throws UnknownHostException
-	 * @throws IOException
+	 * @post The client has no IP address.
 	 */
 	public void releaseIP() throws UnknownHostException, IOException {
 		DatagramSocket socket = new DatagramSocket();
@@ -120,11 +125,9 @@ public class DHCPClient {
 	}
 	
 	/**
-	 * Renews the lease of the client
+	 * Renews the lease of the client.
 	 * 
-	 * @return
-	 * @throws IOException 
-	 * @throws SocketException 
+	 * @post The IP address of the client is equal to the IP address before, with a new lease time period.
 	 */
 	public void renewLease(InetAddress siaddr) throws SocketException, IOException{
 		System.out.println("LEASE RENEWAL STARTED.");
@@ -148,19 +151,13 @@ public class DHCPClient {
 	 * @param socket
 	 *        The DatagramSocket currently in use.
 	 * 
-	 * @return The message sent and the response of the server.
-	 * 
-	 * @throws IllegalArgumentException
-	 * @throws SocketException
-	 * @throws IOException
+	 * @return The response of the server.
 	 */
 	private Message DHCPDiscover(UDPClient client, DatagramSocket socket) throws IllegalArgumentException, SocketException, IOException {
-		
 		DHCPDiscoverMessage discoverMessage = new DHCPDiscoverMessage(MAC_ADDRESS);
 		
 		System.out.println("DHCPDISCOVER sent.");
 		Message response = sendUDPMessage(discoverMessage, client, socket);
-		response = checkResponseOption(53, Utilities.convertToByteArray(1, 2), response, client, socket);
 		return response;
 	}
 	
@@ -179,17 +176,12 @@ public class DHCPClient {
 	 *        The DatagramSocket currently in use.
 	 *        
 	 * @return The reply from the server.
-	 * 
-	 * @throws IOException 
-	 * @throws SocketException 
 	 */
 	private Message DHCPRequest(int transactionID, InetAddress offeredAddress, InetAddress serverAddress, UDPClient client, DatagramSocket socket) throws SocketException, IOException{
-		
 		DHCPRequestMessage requestMessage = new DHCPRequestMessage(transactionID, MAC_ADDRESS, offeredAddress, serverAddress);
 		
 		System.out.println("DHCPREQUEST sent to request IP " + offeredAddress.toString()+" at server " + serverAddress.toString());
 		Message response = sendUDPMessage(requestMessage, client, socket);
-		response = checkResponseOption(53, Utilities.convertToByteArray(1, 5), response, client, socket);
 		return response;
 	}
 
@@ -201,13 +193,12 @@ public class DHCPClient {
 	 * @param socket
 	 *        The DatagramSocket currently in use.
 	 *        
-	 * @throws UnknownHostException
-	 * @throws SocketException
-	 * @throws IOException
+	 * @post  The client has no IP address.
 	 */
 	private void DHCPRelease(UDPClient client, DatagramSocket socket) throws UnknownHostException, SocketException, IOException{
 		DHCPReleaseMessage releaseMessage = new DHCPReleaseMessage(MAC_ADDRESS);
 		sendUDPMessageWithoutResponse(releaseMessage, client, socket);
+		this.setCiaddr(null);
 	}
 	
 	/**
@@ -221,66 +212,30 @@ public class DHCPClient {
 	 *        The DatagramSocket currently in use.
 	 * 
 	 * @return The answer from the server as a message.
-	 * 
-	 * @throws UnknownHostException
-	 * @throws SocketException
-	 * @throws IOException
 	 */
 	private Message sendUDPMessage(Message message, UDPClient client, DatagramSocket socket) throws UnknownHostException, SocketException, IOException {
 		Message response = Message.convertToMessage(client.sendData(message.convertToByteArray(), socket));
-		return checkResponseXid(message.getXid(), response, client, socket);
+		return waitForCorrectAnswer(message.getXid(), response, client, socket);
 	}
 	
 	/**
 	 * Creates a UDP message in DHCP format with all given fields and sends it to the server.
 	 * 
-	 * @param op
-	 *        The opcode for the message.
-	 * @param htype
-	 *        The hardware type for the message.
-	 * @param hlen
-	 *        The hardware address length for the message.
-	 * @param hops
-	 *        The hops for the message.
-	 * @param xid
-	 *        The transaction ID for the message.
-	 * @param secs
-	 *        The seconds passed for the message.
-	 * @param flags
-	 *        The flags for the message.
-	 * @param ciaddr
-	 *        The client IP address for the message.
-	 * @param yiaddr
-	 *        Your IP address for the message.
-	 * @param siaddr
-	 *        The server IP address for the message.
-	 * @param giaddr
-	 *        The gateway IP address for the message.
-	 * @param chaddr
-	 *        The client hardware address for the message.
-	 * @param sname
-	 *        The server name for the message.
-	 * @param file
-	 *        The file for the message.
-	 * @param cookie
-	 *        The cookie for the message.
-	 * @param options
-	 *        The options for the message.
+	 * @param message
+	 * 		  The message to be sent.
 	 * @param client
 	 *        The UDPClient currently in use.
 	 * @param socket
 	 *        The DatagramSocket currently in use.
 	 * 
-	 * @throws UnknownHostException
-	 * @throws SocketException
-	 * @throws IOException
 	 */
 	private void sendUDPMessageWithoutResponse(Message message, UDPClient client, DatagramSocket socket) throws UnknownHostException, SocketException, IOException {
 		client.sendDataWithoutResponse(message.convertToByteArray(), socket);
 	}
 	
 	/**
-	 * Checks if the response received is the correct response. If not, waits for the correct response to return.
+	 * Checks if the response received is the correct response and returns the response message.
+	 * If an incorrect response is received, wait for the correct response to return.
 	 * 
 	 * @param xid
 	 *        The transaction ID of the message sent by the client to compare with the transaction ID of the received message.
@@ -293,19 +248,15 @@ public class DHCPClient {
 	 *        
 	 * @return The correct reply from the server.
 	 * 
-	 * @throws UnknownHostException
-	 * @throws UnsupportedEncodingException
-	 * @throws IllegalArgumentException
-	 * @throws IOException
 	 */
-	private Message checkResponseXid(int xid, Message response, UDPClient client, DatagramSocket socket) throws UnknownHostException, UnsupportedEncodingException, IllegalArgumentException, IOException{
+	private Message waitForCorrectAnswer(int xid, Message response, UDPClient client, DatagramSocket socket) throws UnknownHostException, UnsupportedEncodingException, IllegalArgumentException, IOException{
 		if(isCorrectResponseMessage(xid, response)){
 			System.out.println("- Response with matching Xid ("+xid+") received.");
 			return response;
 		}
 		else{
 			System.out.println("- Response did not have matching Xid. Awaiting correct response.");
-			return checkResponseXid(xid, Message.convertToMessage(client.waitForAndReturnResponse(socket)), client, socket);
+			return waitForCorrectAnswer(xid, Message.convertToMessage(client.waitForAndReturnResponse(socket)), client, socket);
 		}
 	}
 	
@@ -324,38 +275,5 @@ public class DHCPClient {
 			return true;
 		else
 			return false;
-	}
-	
-	/**
-	 * Checks if a given message has certain option and if contents are equal to given contents. If not, waits for the correct response to return.
-	 * 
-	 * @param optionCode
-	 *        The option code of the option to be compared.
-	 * @param response
-	 *        The response to check the options from.
-	 * @param contents
-	 *        The contents of compare the contents of the option to.
-	 * @param client
-	 *        The UDPClient currently in use.
-	 * @param socket
-	 *        The DatagramSocket currently in use.
-	 *        
-	 * @return The response of which the specified option contents match the given contents.
-	 * 
-	 * @throws IOException 
-	 * @throws IllegalArgumentException 
-	 * @throws UnsupportedEncodingException 
-	 * @throws UnknownHostException 
-	 */
-	private Message checkResponseOption(int optionCode, byte[] contents, Message response, UDPClient client, DatagramSocket socket) throws UnknownHostException, UnsupportedEncodingException, IllegalArgumentException, IOException{
-		Option responseOption = response.getOptions().getOption(optionCode);
-		if(optionCode == responseOption.getOptionCode() && Arrays.equals(responseOption.getContents(), contents)){
-			System.out.println("- Option "+optionCode+" equals the given contents.");
-			return response;
-		}
-		else{
-			System.out.println("- Option "+optionCode+" does not equal the given contents, awaiting correct response.");
-			return checkResponseOption(optionCode, contents, Message.convertToMessage(client.waitForAndReturnResponse(socket)), client, socket);
-		}
 	}
 }

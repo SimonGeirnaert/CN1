@@ -17,7 +17,7 @@ public class Message {
 	 **********************************************************/
 	
 	/**
-	 * Initialize the new mesage with given opcode, hardware type, hardware address length, number of hops, transactionID, number of seconds, flags, client IP address,
+	 * Initialize the new message with given opcode, hardware type, hardware address length, number of hops, transactionID, number of seconds, flags, client IP address,
 	 * your IP address, the server IP address, the relay agent IP address, the client hardware address, the server name, the file, and the options.
 	 * 
 	 * @param op
