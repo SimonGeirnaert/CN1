@@ -16,10 +16,16 @@ public class DHCPRequestMessage extends Message {
 	private static final int FLAGS1 = 32768;
 	
 	/**
-	 * Intialize the new DHCP discover message with given MAC address
+	 * Intialize the new DHCP request message with given transaction ID, MAC address, offered address and server address.
 	 * 
+	 * @param transactionID
+	 * 		  The transaction ID of the messages.
 	 * @param macAddress
 	 * 		  The MAC Address of the client.
+	 * @param offeredAddress
+	 * 		  The offered address, received from the server.
+	 * @param serverAddress
+	 * 	      The IP address of the server.
 	 * @throws IllegalArgumentException
 	 * @throws UnknownHostException
 	 */
