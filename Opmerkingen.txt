@@ -11,3 +11,6 @@ DHCP Client
 
 DHCP Server
 - Alles
+
+*DHCPClient: - kijken of releases efficiënter kunnen
+		
