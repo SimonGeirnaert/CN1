@@ -15,6 +15,42 @@ public class Message {
 	 * Constructor
 	 **********************************************************/
 	
+	/**
+	 * Initialize the new mesage with given opcode, hardware type, hardware address length, number of hops, transactionID, number of seconds, flags, client IP address,
+	 * your IP address, the server IP address, the relay agent IP address, the client hardware address, the server name, the file, and the options.
+	 * 
+	 * @param op
+	 * 		  The opcode of the message
+	 * @param htype
+	 * 		  The hardware type of the message
+	 * @param hlen
+	 * 		  The hardware address length of the message
+	 * @param hops
+	 * 		  The number of hops of the message
+	 * @param xid
+	 * 	      The transaction ID of the message
+	 * @param secs
+	 * 	      The number of seconds of the message
+	 * @param flags
+	 * 		  The flags of the message.
+	 * @param ciaddr
+	 * 		  The client IP address
+	 * @param yiaddr
+	 * 		  Your IP address
+	 * @param siaddr
+	 * 		  The sever IP address
+	 * @param giaddr
+	 * 		  The relay agent IP address
+	 * @param chaddr
+	 * 		  The client hardware address
+	 * @param sname
+	 * 		  The server name
+	 * @param file
+	 * 		  The file of the message
+	 * @param options
+	 * 		  The options of the message
+	 * @throws IllegalArgumentException
+	 */
 	public Message(int op, int htype, int hlen, int hops, int xid, int secs, int flags, InetAddress ciaddr, InetAddress yiaddr, InetAddress siaddr, InetAddress giaddr, String chaddr, String sname, String file, OptionsList options) throws IllegalArgumentException {
 		setOp(op);
 		setHtype(htype);
