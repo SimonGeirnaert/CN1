@@ -52,16 +52,7 @@ public class UDPClient {
 	 *         The construction of the DatagramSocket has failed.
 	 */
 	public byte[] sendData(byte[] sendData, DatagramSocket socket) throws UnknownHostException, IOException {
-		
-		// Make datagram socket
-		// DatagramSocket socket = new DatagramSocket();
-		
-		// Send packet
-		InetAddress IPAddress = InetAddress.getByName(IP_SERVER);
-		//System.out.println(IPAddress);
-		DatagramPacket sendPacket = new DatagramPacket(sendData, PACKETSIZE, IPAddress, DESTINATION_PORT);
-		socket.send(sendPacket);
-		//System.out.println("packet sent");
+		sendDataWithoutResponse(sendData, socket);
 		return waitForAndReturnResponse(socket);
 	}
 	
