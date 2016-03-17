@@ -26,7 +26,6 @@ public class DHCPClient {
 	 * Client IP
 	 **********************************************************/
 	
-	
 	/**
 	 * Variable representing the client IP address.
 	 */
@@ -49,33 +48,6 @@ public class DHCPClient {
 	 */
 	private void setCiaddr(InetAddress ciaddr) {
 		this.ciaddr = ciaddr;
-	}
-	
-	/**********************************************************
-	 * Server IP
-	 **********************************************************/
-	
-	
-	/**
-	 * Variable representing the server IP address that issued the IP of the client.
-	 */
-	private InetAddress siaddr = null;
-	
-	/**
-	 * @return The IP address of the DHCP server that issued the IP of the client.
-	 */
-	public InetAddress getSiaddr() {
-		return siaddr;
-	}
-
-	/**
-	 * Sets the IP address of the DHCP server.
-	 * 
-	 * @param siaddr
-	 *        The IP address to set.
-	 */
-	private void setSiaddr(InetAddress siaddr) {
-		this.siaddr = siaddr;
 	}
 	
 	
@@ -111,7 +83,7 @@ public class DHCPClient {
 	 **********************************************************/
 
 	/**
-	 * Constructor.
+	 * Initialize the new DHCPClient
 	 */
 	public DHCPClient(){
 		
@@ -145,7 +117,6 @@ public class DHCPClient {
 			setLeaseTime(Utilities.convertToInt(acknowledge.getOptions().getOption(51).getContents()));
 			int leaseTime = Utilities.convertToInt(acknowledge.getOptions().getOption(51).getContents());
 			System.out.println("- Lease time: " + leaseTime + " seconds.");
-			setSiaddr(acknowledge.getSiaddr());
 		}
 		else {
 			// Restart the configuration if NACK received
@@ -158,7 +129,7 @@ public class DHCPClient {
 		socket.close();
 		
 		while(System.currentTimeMillis() - timeBeginLease < 0.5*leaseTime*1000){}
-		renewLease();
+		renewLease(acknowledge.getSiaddr());
 	}
 	
 	/**
@@ -185,12 +156,12 @@ public class DHCPClient {
 	 * @throws IOException 
 	 * @throws SocketException 
 	 */
-	public void renewLease() throws SocketException, IOException{
+	public void renewLease(InetAddress siaddr) throws SocketException, IOException{
 		System.out.println("LEASE RENEWAL STARTED.");
 		DatagramSocket socket = new DatagramSocket();
 		UDPClient client = new UDPClient();
 		
-		Message ack = DHCPRequest(Utilities.generateXid(), getCiaddr(), getSiaddr(), client, socket);
+		Message ack = DHCPRequest(Utilities.generateXid(), getCiaddr(), siaddr, client, socket);
 		setCiaddr(ack.getYiaddr());
 		System.out.println("LEASE RENEWAL COMPLETE, SYSTEM IP SET TO "+ getCiaddr().toString());
 		setLeaseTime(Utilities.convertToInt(ack.getOptions().getOption(51).getContents()));
@@ -199,14 +170,6 @@ public class DHCPClient {
 		socket.close();
 	}
 	
-	/**
-	 * 
-	 * 
-	 * @return
-	 */
-	public Message rebind(){
-		return null;
-	}
 	
 	/**
 	 * Sends a DHCPDISCOVER and returns the answer from the server.

@@ -12,7 +12,6 @@ public class main {
 	public static void main(String[] args) throws Exception {
 		DHCPClient client = new DHCPClient();
 		client.getIP();
-		client.renewLease();
 		client.releaseIP();		
 	}
 
