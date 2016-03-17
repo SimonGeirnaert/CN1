@@ -23,8 +23,8 @@ public class DHCPRequestMessage extends Message {
 	 * @throws IllegalArgumentException
 	 * @throws UnknownHostException
 	 */
-	public DHCPRequestMessage(int serverXid, String macAddress, InetAddress offeredAddress, InetAddress serverAddress) throws IllegalArgumentException, UnknownHostException {
-		super(1,1,6,0, serverXid, 0, FLAGS1, InetAddress.getByName("0.0.0.0"), InetAddress.getByName("0.0.0.0"), InetAddress.getByName("0.0.0.0"), InetAddress.getByName("0.0.0.0"), macAddress, "", "", null);
+	public DHCPRequestMessage(int transactionID, String macAddress, InetAddress offeredAddress, InetAddress serverAddress) throws IllegalArgumentException, UnknownHostException {
+		super(1,1,6,0, transactionID, 0, FLAGS1, InetAddress.getByName("0.0.0.0"), InetAddress.getByName("0.0.0.0"), InetAddress.getByName("0.0.0.0"), InetAddress.getByName("0.0.0.0"), macAddress, "", "", null);
 		Option option53 = new Option(53, Utilities.convertToByteArray(1, 3));
 		Option option50 = new Option(50, offeredAddress.getAddress());
 		Option option54 = new Option(54, serverAddress.getAddress());
