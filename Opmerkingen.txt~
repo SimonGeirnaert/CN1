@@ -12,5 +12,7 @@ DHCP Client
 DHCP Server
 - Alles
 
-*DHCPClient: - kijken of releases efficiënter kunnen
+*DHCPClient: - checkResponseOption?
+	     - wistjedatje: per combinatie van question-response moet xid zelfde zijn, niet ertussen
+	     - rebinden achterwege laten (Hannes doet ook niet): kunnen we ook niet echt doen
 		

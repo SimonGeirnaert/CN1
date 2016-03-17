@@ -21,17 +21,20 @@ public class DHCPClient {
 	 */
 	private static final String MAC_ADDRESS = "KB58AS96QM91LS95";
 	
+	
 	/**********************************************************
 	 * Client IP
 	 **********************************************************/
 	
 	
 	/**
-	 * Variable representing the client IP address
+	 * Variable representing the client IP address.
 	 */
 	private InetAddress ciaddr = null;
 	
 	/**
+	 * Return the IP address of the DHCP client.
+	 * 
 	 * @return The IP address of the DHCP client.
 	 */
 	public InetAddress getCiaddr() {
@@ -42,7 +45,7 @@ public class DHCPClient {
 	 * Sets the IP address of the client.
 	 * 
 	 * @param ciaddr
-	 *        The IP address to set.
+	 *        The new IP address.
 	 */
 	private void setCiaddr(InetAddress ciaddr) {
 		this.ciaddr = ciaddr;
@@ -132,19 +135,16 @@ public class DHCPClient {
 		Message offer = DHCPDiscover(client, socket);
 		System.out.println("DHCPOFFER received.");
 		System.out.println("- Suggested IP: " + offer.getYiaddr().toString());
-		//System.out.println("- Length options DHCPOFFER: " + offer.getOptions().getNumberOfOptions());
 
 		Message acknowledge = DHCPRequest(offer.getXid(), offer.getYiaddr(), offer.getSiaddr(), client, socket);
 		if(Utilities.convertToInt(acknowledge.getOptions().getOption(53).getContents()) == 5) {
 			System.out.println("DHCPACK received.");
-
-			long timeBeginLease = System.currentTimeMillis();
 		
 			setCiaddr(acknowledge.getYiaddr());
 			System.out.println("SYSTEM IP SET TO " + getCiaddr().toString());
 			setLeaseTime(Utilities.convertToInt(acknowledge.getOptions().getOption(51).getContents()));
 			int leaseTime = Utilities.convertToInt(acknowledge.getOptions().getOption(51).getContents());
-			System.out.println("- Lease time: " + leaseTime +" seconds.");
+			System.out.println("- Lease time: " + leaseTime + " seconds.");
 			setSiaddr(acknowledge.getSiaddr());
 		}
 		else {
@@ -152,10 +152,13 @@ public class DHCPClient {
 			System.out.println("DCHPNACK received. Restarting the configuration.");
 			getIP();
 		}
+		
+		long timeBeginLease = System.currentTimeMillis();
+		
 		socket.close();
 		
-//		while(System.currentTimeMillis() - timeBeginLease < leaseTime*1000){}
-//		renewLease();
+		while(System.currentTimeMillis() - timeBeginLease < 0.5*leaseTime*1000){}
+		renewLease();
 	}
 	
 	/**
