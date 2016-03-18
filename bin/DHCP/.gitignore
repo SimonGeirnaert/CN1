@@ -19,3 +19,4 @@
 /IPAddress.class
 /DHCPAckMessage.class
 /DHCPNackMessage.class
+/DHCPNakMessage.class

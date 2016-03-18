@@ -129,7 +129,7 @@ public class DHCPClient extends DHCP {
 		
 		// Negative acknowledge received, reconfiguration
 		else {
-			System.out.println("DCHPNACK received. Restarting the configuration.");
+			System.out.println("DCHPNAK received. Restarting the configuration.");
 			socket.close();
 			getIP();
 		}

@@ -262,7 +262,9 @@ public class DHCPServer extends DHCP {
 					operate();
 				}
 				else{
-					//DHCPNack();
+					DHCPNak(response.getXid(), response.getChaddr(), server, socket);
+					socket.close();
+					operate();
 				}
 			}
 		} catch (IllegalArgumentException e) {
@@ -275,7 +277,8 @@ public class DHCPServer extends DHCP {
 		
 			else{
 				System.out.println("Unknown message received. Ignoring message and resuming normal operation.");
-				socket.close();					operate();
+				socket.close();
+				operate();
 			}
 		}
 	}
@@ -326,11 +329,16 @@ public class DHCPServer extends DHCP {
 	 * Sends a DHCPACK message to the client to confirm that the IP address is now leased to the client.
 	 * 
 	 * @param xid
+	 *        The transaction ID provided by the client.
 	 * @param reqIP
+	 *        The IP offered by the server.
 	 * @param macAddr
+	 *        The MAC address of the client.
 	 * @param server
+	 *        The UDP connection currently in use.
 	 * @param socket
-	 * @return
+	 *        The DatagramSocket currently in use.
+	 * 
 	 * @throws Exception
 	 */
 	private void DHCPAck(int xid, InetAddress reqIP, String macAddr, UDP server, DatagramSocket socket) throws Exception {
@@ -341,20 +349,24 @@ public class DHCPServer extends DHCP {
 	}
 	
 	/**
-	 * Sends a DHCPNACK message to the client to state that the IP address offered can not be leased.
+	 * Sends a DHCPNAK message to the client to state that the IP address offered can not be leased.
 	 * 
 	 * @param xid
+	 *        The transaction ID provided by the client.
 	 * @param reqIP
+	 *        The IP offered by the server.
 	 * @param macAddr
+	 *        The MAC address of the client.
 	 * @param server
+	 *        The UDP connection currently in use.
 	 * @param socket
-	 * @return
+	 *        The DatagramSocket currently in use.
+	 *        
 	 * @throws Exception
 	 */
-//	private Message DHCPNack(int xid, InetAddress reqIP, String macAddr, UDP server, DatagramSocket socket) throws Exception {
-//		DHCPNackMessage nackMessage = new DHCPNackMessage(xid, reqIP, getServerIP(), macAddr, this);
-//		
-//		System.out.println("DHCPNACK sent.");
-//		sendUDPMessageWithoutResponse(nackMessage, server, socket);
-//	}
+	private void DHCPNak(int xid, String macAddr, UDP server, DatagramSocket socket) throws Exception {
+		DHCPNakMessage nakMessage = new DHCPNakMessage(xid, macAddr);
+		System.out.println("DHCPNAK sent.");
+		sendUDPMessageWithoutResponse(nakMessage, server, socket);
+	}
 }
