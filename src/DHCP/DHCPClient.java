@@ -95,7 +95,7 @@ public class DHCPClient extends DHCP {
 		// Initialize connection sockets and settings
 		DatagramSocket socket = new DatagramSocket();
 		//UDP client = new UDP(InetAddress.getByName("10.33.14.246"), 1234);
-		UDP client = new UDP(InetAddress.getByName("localhost"), DHCP.SERVER_PORT);
+		UDP client = new UDP(InetAddress.getByName("localhost"), 1602);
 		
 		// Discover
 		Message offer = DHCPDiscover(client, socket);
@@ -143,7 +143,7 @@ public class DHCPClient extends DHCP {
 	public void releaseIP() throws UnknownHostException, IOException {
 		DatagramSocket socket = new DatagramSocket();
 		//UDP client = new UDP(InetAddress.getByName("10.33.14.246"), 1234);
-		UDP client = new UDP(InetAddress.getByName("localhost"), 1600);
+		UDP client = new UDP(InetAddress.getByName("localhost"), 1602);
 		
 		DHCPRelease(client, socket);
 		setCiaddr(null);
@@ -161,7 +161,7 @@ public class DHCPClient extends DHCP {
 		System.out.println("LEASE RENEWAL STARTED.");
 		DatagramSocket socket = new DatagramSocket();
 		//UDP client = new UDP(InetAddress.getByName("10.33.14.246"), 1234);
-		UDP client = new UDP(InetAddress.getByName("localhost"), 1600);
+		UDP client = new UDP(InetAddress.getByName("localhost"), 1602);
 		
 		Message ack = DHCPRequest(Utilities.generateXid(), getCiaddr(), siaddr, client, socket);
 		setCiaddr(ack.getYiaddr());

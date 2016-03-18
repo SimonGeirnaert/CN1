@@ -232,7 +232,7 @@ public class DHCPServer extends DHCP {
 	 */
 	public void operate() throws Exception {
 		UDP server = new UDP(InetAddress.getByName("localhost"), 0);
-		DatagramSocket socket = new DatagramSocket(SERVER_PORT);
+		DatagramSocket socket = new DatagramSocket(1602);
 		ReceivedData rcvd = server.receiveData(socket);
 		Message incomingMessage = Message.convertToMessage(rcvd.getData());
 		server.setDestinationPort(rcvd.getPort());
