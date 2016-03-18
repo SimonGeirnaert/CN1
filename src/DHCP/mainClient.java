@@ -1,6 +1,6 @@
 package DHCP;
 
-public class main {
+public class mainClient {
 
 	/**
 	 * @param args

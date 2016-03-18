@@ -10,7 +10,7 @@ public class mainServer {
 	 */
 	public static void main(String[] args) throws Exception {
 		DHCPServer server = new DHCPServer(InetAddress.getByName("localhost"));
-		server.server();
+		server.operate();
 
 	}
 
