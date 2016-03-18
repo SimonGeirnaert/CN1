@@ -118,8 +118,8 @@ public class DHCPClient extends DHCP {
 		
 			setCiaddr(acknowledge.getYiaddr());
 			System.out.println("SYSTEM IP SET TO " + getCiaddr().toString());
-//			int leaseTime = Utilities.convertToInt(acknowledge.getOptions().getOption(51).getContents());
-			int leaseTime = 10; //to simulate lease time of 10 seconds
+			int leaseTime = Utilities.convertToInt(acknowledge.getOptions().getOption(51).getContents());
+			//int leaseTime = 10; //to simulate lease time of 10 seconds
 			System.out.println("- Lease time: " + leaseTime + " seconds.");
 			socket.close();
 			long timeBeginLease = System.currentTimeMillis();

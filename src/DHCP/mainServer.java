@@ -9,7 +9,7 @@ public class mainServer {
 	 * @throws Exception 
 	 */
 	public static void main(String[] args) throws Exception {
-		DHCPServer server = new DHCPServer(InetAddress.getByName("localhost"));
+		DHCPServer server = new DHCPServer(InetAddress.getByName("localhost"), 10);
 		server.operate();
 
 	}

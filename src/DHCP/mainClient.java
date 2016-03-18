@@ -1,5 +1,7 @@
 package DHCP;
 
+import java.net.InetAddress;
+
 public class mainClient {
 
 	/**
@@ -8,8 +10,12 @@ public class mainClient {
 	 */
 	public static void main(String[] args) throws Exception {
 		DHCPClient client = new DHCPClient("JH57DF98RV15FH96");
+		DHCPClient client2 = new DHCPClient("JH57DF98RV15FH95");
 		client.getIP();
-		client.releaseIP();		
+		client2.getIP();
+		client.renewLease(InetAddress.getByName("localhost"));
+		client.releaseIP();	
+		client2.releaseIP();
 	}
 
 }

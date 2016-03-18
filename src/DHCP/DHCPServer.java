@@ -40,9 +40,33 @@ public class DHCPServer extends DHCP {
 	}
 	
 	/**********************************************************
-	 * Pool of IP addresses
+	 * Lease time
 	 **********************************************************/
 	
+	private int lease = 0;
+	
+	/**
+	 * @return The server lease time.
+	 */
+	public int getLease() {
+		return lease;
+	}
+
+	/**
+	 * Set the server lease time.
+	 * 
+	 * @param lease
+	 *        The lease time to set
+	 */
+	private void setLease(int lease) {
+		this.lease = lease;
+	}
+
+	
+	/**********************************************************
+	 * Pool of IP addresses
+	 **********************************************************/
+
 	/**
 	 * Variable representing the pool of IP addresses the server can issue.
 	 */
@@ -116,10 +140,26 @@ public class DHCPServer extends DHCP {
 	 */
 	public InetAddress getAvailableAddress() throws Exception{
 		for(int i=0; i<getPool().size(); i++){
-			if(getPool().get(i).isLeased()==false) return
-					getPool().get(i).getIpAddr();
+			if(getPool().get(i).isLeased()==false)
+					return getPool().get(i).getIpAddr();
 		}
 		throw new Exception("There are currently no IP addresses available.");
+	}
+	
+	/**
+	 * Returns the IP address in use by the client with the give MAC address.
+	 * 
+	 * @param macAddr
+	 *        The MAC address of the client of which the IP should be returned.
+	 *        
+	 * @return The IP address in use by the client with the give MAC address.
+	 */
+	private InetAddress getIPByMacAddr(String macAddr){
+		for(int i=0; i<getPool().size(); i++){
+			if(getPool().get(i).getMacAddr().equals(macAddr))
+					return getPool().get(i).getIpAddr();
+		}
+		throw new IllegalArgumentException("The given MAC address has no active lease.");
 	}
 	
 	/**
@@ -149,6 +189,22 @@ public class DHCPServer extends DHCP {
 		return null;
 	}
 	
+	/**
+	 * Returns the IPAddress from the pool for the given InetAddress.
+	 * 
+	 * @param addr
+	 *        The given InetAddress
+	 *        
+	 * @return The IPAddress if it is present in the pool, else null.
+	 */
+	private IPAddress getIPFromPoolByMacAddr(String macAddr){
+		for(int i=0; i<getPool().size(); i++){
+			if(getPool().get(i).getMacAddr().equals(macAddr))
+				return getPool().get(i);
+		}
+		return null;
+	}
+	
 	/**********************************************************
 	 * Constructor
 	 **********************************************************/
@@ -161,8 +217,9 @@ public class DHCPServer extends DHCP {
 	 *        
 	 * @throws UnknownHostException 
 	 */
-	public DHCPServer(InetAddress serverIP) throws UnknownHostException{
+	public DHCPServer(InetAddress serverIP, int lease) throws UnknownHostException{
 		setServerIP(serverIP);
+		setLease(lease);
 		createPool();
 	}
 	
@@ -188,33 +245,37 @@ public class DHCPServer extends DHCP {
 	
 	
 	private void handleResponse(Message response, UDP server, DatagramSocket socket) throws Exception{
-		if(Utilities.convertToInt(response.getOptions().getOption(53).getContents()) == 1) {
-			System.out.println("DHCPDISCOVER received.");
-			InetAddress reqIP = InetAddress.getByAddress(response.getOptions().getOption(50).getContents());	
-			handleResponse(DHCPOffer(response.getXid(), reqIP, response.getChaddr(), server, socket), server, socket);
-		}
-		else if(Utilities.convertToInt(response.getOptions().getOption(53).getContents()) == 3){
-			System.out.println("DHCPREQUEST received.");
-			InetAddress offeredIP = InetAddress.getByAddress(response.getOptions().getOption(50).getContents());
-			if(isInPool(offeredIP) && getIPFromPool(offeredIP).isLeased()==false){
-				getIPFromPool(offeredIP).setLeased(true);
-				handleResponse(DHCPAck(response.getXid(), InetAddress.getByAddress(response.getOptions().getOption(50).getContents()), response.getChaddr(), server, socket), server, socket);
+		try{
+			if(Utilities.convertToInt(response.getOptions().getOption(53).getContents()) == 1) {
+				System.out.println("DHCPDISCOVER received.");
+				InetAddress reqIP = InetAddress.getByAddress(response.getOptions().getOption(50).getContents());	
+				handleResponse(DHCPOffer(response.getXid(), reqIP, response.getChaddr(), server, socket), server, socket);
 			}
-			else{
-				//DHCPNack();
+			else if(Utilities.convertToInt(response.getOptions().getOption(53).getContents()) == 3){
+				System.out.println("DHCPREQUEST received.");
+				InetAddress offeredIP = InetAddress.getByAddress(response.getOptions().getOption(50).getContents());
+				if((isInPool(offeredIP) && getIPFromPool(offeredIP).isLeased()==false) || (offeredIP.equals(getIPByMacAddr(response.getChaddr())))){
+					getIPFromPool(offeredIP).setLeased(true);
+					getIPFromPool(offeredIP).setMacAddr(response.getChaddr());
+					DHCPAck(response.getXid(), InetAddress.getByAddress(response.getOptions().getOption(50).getContents()), response.getChaddr(), server, socket);
+					socket.close();
+					operate();
+				}
+				else{
+					//DHCPNack();
+				}
 			}
-			
-		}
-		else{
-			if(response.getYiaddr().equals(InetAddress.getByName("0.0.0.0"))) {
+		} catch (IllegalArgumentException e) {
+			if(response.getYiaddr().equals(InetAddress.getByName("0.0.0.0"))) {		
 				System.out.println("DHCPRELEASE received.");
+				getIPFromPoolByMacAddr(response.getChaddr()).setLeased(false); //dont remove MAC addr from pool to make quick initialization possible
+				socket.close();
 				operate();
 			}
-			// TODO MAC addr zal nog nodig zijn in IPAddress om bij te houden in pool
-			
+		
 			else{
 				System.out.println("Unknown message received. Ignoring message and resuming normal operation.");
-				operate();
+				socket.close();					operate();
 			}
 		}
 	}
@@ -272,12 +333,11 @@ public class DHCPServer extends DHCP {
 	 * @return
 	 * @throws Exception
 	 */
-	private Message DHCPAck(int xid, InetAddress reqIP, String macAddr, UDP server, DatagramSocket socket) throws Exception {
-		DHCPAckMessage ackMessage = new DHCPAckMessage(xid, reqIP, getServerIP(), macAddr);
+	private void DHCPAck(int xid, InetAddress reqIP, String macAddr, UDP server, DatagramSocket socket) throws Exception {
+		DHCPAckMessage ackMessage = new DHCPAckMessage(xid, reqIP, getServerIP(), macAddr, getLease());
 		
 		System.out.println("DHCPACK sent.");
-		Message response = sendUDPMessage(ackMessage, server, socket);
-		return response;
+		sendUDPMessageWithoutResponse(ackMessage, server, socket);
 	}
 	
 	/**
@@ -295,7 +355,6 @@ public class DHCPServer extends DHCP {
 //		DHCPNackMessage nackMessage = new DHCPNackMessage(xid, reqIP, getServerIP(), macAddr, this);
 //		
 //		System.out.println("DHCPNACK sent.");
-//		Message response = sendUDPMessage(nackMessage, server, socket);
-//		return response;
+//		sendUDPMessageWithoutResponse(nackMessage, server, socket);
 //	}
 }

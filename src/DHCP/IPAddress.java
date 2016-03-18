@@ -3,7 +3,7 @@ package DHCP;
 import java.net.InetAddress;
 
 /**
- * Class representing an IP address for the server to issue.
+ * Class representing an IP address for the server to issue and keeps track of the MAC address using it..
  * 
  * @author Simon Geirnaert
  *         Laurent De Laere
@@ -58,4 +58,27 @@ public class IPAddress {
 		this.leased = leased;
 	}
 
+	/**
+	 * Variable representing the hardware address of the client using this IP
+	 */
+	private String macAddr = "";
+
+	/**
+	 * @return The hardware address of the client using this IP.
+	 */
+	public String getMacAddr() {
+		return macAddr;
+	}
+
+	/**
+	 * Sets the hardware address of the client using this IP.
+	 * 
+	 * @param macAddr
+     *        The hardware address to set.
+	 */
+	public void setMacAddr(String macAddr) {
+		this.macAddr = macAddr;
+	}
+	
+	
 }
