@@ -18,7 +18,9 @@ public class DHCPAckMessage extends Message {
 	 * 		  The MAC address of the client.
 	 * @effect The DHCP ack message is a message with standard fields and no options.
 	 */
-	public DHCPAckMessage(int xid, String macAddress) throws IllegalArgumentException, UnknownHostException {
-		super(1,1,6,0, xid, 0, FLAGS0, InetAddress.getByName("0.0.0.0"), InetAddress.getByName("0.0.0.0"), InetAddress.getByName("0.0.0.0"), InetAddress.getByName("0.0.0.0"), macAddress, "", "",  new OptionsList());
+	public DHCPAckMessage(int xid, InetAddress assignedAddr, InetAddress serverIP, String macAddress) throws IllegalArgumentException, UnknownHostException {
+		super(2,1,6,0, xid, 0, FLAGS1, InetAddress.getByName("0.0.0.0"), assignedAddr, serverIP, InetAddress.getByName("0.0.0.0"), macAddress, "", "",  null);
+		OptionsList options = new OptionsList(new Option(53, Utilities.convertToByteArray(1, 5)));
+		this.setOptions(options);
 	}
 }

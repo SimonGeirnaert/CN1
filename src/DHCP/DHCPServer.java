@@ -180,36 +180,43 @@ public class DHCPServer extends DHCP {
 		Message incomingMessage = Message.convertToMessage(rcvd.getData());
 		server.setDestinationPort(rcvd.getPort());
 		
-		if(Utilities.convertToInt(incomingMessage.getOptions().getOption(53).getContents()) == 1) {
+		handleResponse(incomingMessage, server, socket);
+		
+		socket.close();
+		operate();
+	}
+	
+	
+	private void handleResponse(Message response, UDP server, DatagramSocket socket) throws Exception{
+		if(Utilities.convertToInt(response.getOptions().getOption(53).getContents()) == 1) {
 			System.out.println("DHCPDISCOVER received.");
-			InetAddress reqIP = InetAddress.getByAddress(incomingMessage.getOptions().getOption(50).getContents());	
-			DHCPOffer(incomingMessage.getXid(), reqIP, incomingMessage.getChaddr(), server, socket);
+			InetAddress reqIP = InetAddress.getByAddress(response.getOptions().getOption(50).getContents());	
+			handleResponse(DHCPOffer(response.getXid(), reqIP, response.getChaddr(), server, socket), server, socket);
 		}
-		else if(Utilities.convertToInt(incomingMessage.getOptions().getOption(53).getContents()) == 3){
+		else if(Utilities.convertToInt(response.getOptions().getOption(53).getContents()) == 3){
 			System.out.println("DHCPREQUEST received.");
-			InetAddress offeredIP = InetAddress.getByAddress(incomingMessage.getOptions().getOption(50).getContents());
+			InetAddress offeredIP = InetAddress.getByAddress(response.getOptions().getOption(50).getContents());
 			if(isInPool(offeredIP) && getIPFromPool(offeredIP).isLeased()==false){
 				getIPFromPool(offeredIP).setLeased(true);
-				DHCPAck();
+				handleResponse(DHCPAck(response.getXid(), InetAddress.getByAddress(response.getOptions().getOption(50).getContents()), response.getChaddr(), server, socket), server, socket);
 			}
 			else{
-				DHCPNack();
+				//DHCPNack();
 			}
 			
 		}
 		else{
-			if(incomingMessage.getYiaddr().equals(InetAddress.getByName("0.0.0.0")))
-			System.out.println("DHCPRELEASE received.");
+			if(response.getYiaddr().equals(InetAddress.getByName("0.0.0.0"))) {
+				System.out.println("DHCPRELEASE received.");
+				operate();
+			}
 			// TODO MAC addr zal nog nodig zijn in IPAddress om bij te houden in pool
 			
 			else{
 				System.out.println("Unknown message received. Ignoring message and resuming normal operation.");
+				operate();
 			}
 		}
-		
-		socket.close();
-		operate();
-
 	}
 	
 	/**
@@ -266,7 +273,7 @@ public class DHCPServer extends DHCP {
 	 * @throws Exception
 	 */
 	private Message DHCPAck(int xid, InetAddress reqIP, String macAddr, UDP server, DatagramSocket socket) throws Exception {
-		DHCPAckMessage ackMessage = new DHCPAckMessage(xid, reqIP, getServerIP(), macAddr, this);
+		DHCPAckMessage ackMessage = new DHCPAckMessage(xid, reqIP, getServerIP(), macAddr);
 		
 		System.out.println("DHCPACK sent.");
 		Message response = sendUDPMessage(ackMessage, server, socket);
@@ -284,11 +291,11 @@ public class DHCPServer extends DHCP {
 	 * @return
 	 * @throws Exception
 	 */
-	private Message DHCPNack(int xid, InetAddress reqIP, String macAddr, UDP server, DatagramSocket socket) throws Exception {
-		DHCPNackMessage nackMessage = new DHCPNackMessage(xid, reqIP, getServerIP(), macAddr, this);
-		
-		System.out.println("DHCPNACK sent.");
-		Message response = sendUDPMessage(nackMessage, server, socket);
-		return response;
-	}
+//	private Message DHCPNack(int xid, InetAddress reqIP, String macAddr, UDP server, DatagramSocket socket) throws Exception {
+//		DHCPNackMessage nackMessage = new DHCPNackMessage(xid, reqIP, getServerIP(), macAddr, this);
+//		
+//		System.out.println("DHCPNACK sent.");
+//		Message response = sendUDPMessage(nackMessage, server, socket);
+//		return response;
+//	}
 }
