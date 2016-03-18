@@ -9,3 +9,9 @@
 /UDPServer.class
 /Utilities.class
 /main.class
+/UDP.class
+/ReceivedData.class
+/DHCPOfferMessage.class
+/DHCPServer.class
+/DHCP.class
+/mainServer.class

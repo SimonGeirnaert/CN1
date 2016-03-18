@@ -11,11 +11,6 @@ import java.net.UnknownHostException;
  *
  */
 public class DHCPDiscoverMessage extends Message {
-
-	/**
-	 * Constant representing the flag to receive the DHCPOFFER in broadcast
-	 */
-	private static final int FLAGS1 = 32768;
 	
 	/**
 	 * Initialize the new DHCP discover message with given MAC address
