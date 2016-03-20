@@ -12,11 +12,6 @@ import java.net.UnknownHostException;
 public class DHCPReleaseMessage extends Message {
 	
 	/**
-	 * Constant representing the flag to receive the DHCPOFFER in unicast
-	 */
-	private static final int FLAGS0 = 0;
-	
-	/**
 	 * Intialize the new DHCP release message with given MAC address
 	 * 
 	 * @param macAddress

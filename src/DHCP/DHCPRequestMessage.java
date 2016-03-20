@@ -10,11 +10,6 @@ import java.net.UnknownHostException;
  *
  */
 public class DHCPRequestMessage extends Message {
-
-	/**
-	 * Constant representing the flag to receive the DHCPOFFER in broadcast
-	 */
-	private static final int FLAGS1 = 32768;
 	
 	/**
 	 * Initialize the new DHCP request message with given transaction ID, MAC address, offered address and server address.

@@ -1,7 +1,4 @@
 package DHCP;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.util.Arrays;
 
 public class main {
 
@@ -10,10 +7,9 @@ public class main {
 	 * @throws Exception 
 	 */
 	public static void main(String[] args) throws Exception {
-		DHCPClient client = new DHCPClient();
+		DHCPClient client = new DHCPClient("JH57DF98RV15FH96");
 		client.getIP();
 		client.releaseIP();		
 	}
-
 
 }

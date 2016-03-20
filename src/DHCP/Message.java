@@ -12,6 +12,16 @@ import java.net.UnknownHostException;
  */
 public class Message {
 	
+	/**
+	 * Constant representing the flag to receive the reply in broadcast
+	 */
+	protected static final int FLAGS1 = 32768;
+	
+	/**
+	 * Constant representing the flag to receive the reply in unicast
+	 */
+	protected static final int FLAGS0 = 0;
+	
 	/**********************************************************
 	 * Constructor
 	 **********************************************************/
