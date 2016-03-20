@@ -25,4 +25,6 @@ DHCP Server
 Algemeen voor setters en constructoren: eens kijken naar precondities?
 
 - Commentaar bij grote methodes van message plaatsen. + posts in constructor
+
+*UDP: ik denk dat we terug zullen moeten splitsen als we willen multithreaden
 		
