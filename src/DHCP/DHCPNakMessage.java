@@ -3,7 +3,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 /**
- * Class representing a DHCP n&k message.
+ * Class representing a DHCP nak message.
  * 
  * @author Laurent De Laere
  * 		   Simon Geirnaert

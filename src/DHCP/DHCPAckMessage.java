@@ -3,7 +3,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 /**
- * Class representing a DHCP ack message.
+ * Class representing a DHCP acknowledge message.
  * 
  * @author Laurent De Laere
  * 		   Simon Geirnaert
@@ -12,7 +12,7 @@ import java.net.UnknownHostException;
 public class DHCPAckMessage extends Message {
 	
 	/**
-	 * Initialize a new DHCP ack message
+	 * Initialize a new DHCP acknowledge message
 	 * 
 	 * @param xid
 	 *        The transaction ID provided by the client
@@ -24,9 +24,7 @@ public class DHCPAckMessage extends Message {
 	 *        The MAC address of the client
 	 * @param leaseTime
 	 *        The lease time provided by the server
-	 *        
-	 * @throws IllegalArgumentException
-	 * @throws UnknownHostException
+	 * @effect 
 	 */
 	public DHCPAckMessage(int xid, InetAddress assignedAddr, InetAddress serverIP, String macAddress, int leaseTime) throws IllegalArgumentException, UnknownHostException {
 		super(2,1,6,0, xid, 0, FLAGS1, InetAddress.getByName("0.0.0.0"), assignedAddr, serverIP, InetAddress.getByName("0.0.0.0"), macAddress, "", "",  null);
