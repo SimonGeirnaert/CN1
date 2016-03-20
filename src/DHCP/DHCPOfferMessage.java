@@ -1,7 +1,6 @@
 package DHCP;
 
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 
 /**
  * Class representing a DHCP Discover message.
@@ -17,10 +16,14 @@ public class DHCPOfferMessage extends Message {
 	 * 
 	 * @param macAddress
 	 * 		  The MAC Address of the client.
+	 * 
+	 * @throws Exception 
+	 *         When no IP addresses are available.
+	 * 
 	 * @effect The DHCP discover message is a message with standard fields and given MAC address and standard
 	 * 		   options for a discover message.
 	 */
-	public DHCPOfferMessage(int xid, InetAddress requestedIP, InetAddress serverIP, String macAddress, DHCPServer server) throws IllegalArgumentException, UnknownHostException {
+	public DHCPOfferMessage(int xid, InetAddress requestedIP, InetAddress serverIP, String macAddress, DHCPServer server) throws Exception {
 		super(2,1,6,0, xid, 0, FLAGS0, InetAddress.getByName("0.0.0.0"), server.getOfferIP(requestedIP), serverIP, InetAddress.getByName("0.0.0.0"), macAddress, "", "", null);
 		Option option53 = new Option(53, Utilities.convertToByteArray(1, 2));
 		Option option255 = new Option(255, new byte[0]);

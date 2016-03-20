@@ -95,7 +95,7 @@ public class DHCPClient extends DHCP {
 		// Initialize connection sockets and settings
 		DatagramSocket socket = new DatagramSocket();
 		//UDP client = new UDP(InetAddress.getByName("10.33.14.246"), 1234);
-		UDP client = new UDP(InetAddress.getByName("localhost"), DHCP.SERVER_PORT);
+		UDP client = new UDP(InetAddress.getByName("localhost"), 1602);
 		
 		// Discover
 		Message offer = DHCPDiscover(client, socket);
@@ -118,8 +118,8 @@ public class DHCPClient extends DHCP {
 		
 			setCiaddr(acknowledge.getYiaddr());
 			System.out.println("SYSTEM IP SET TO " + getCiaddr().toString());
-//			int leaseTime = Utilities.convertToInt(acknowledge.getOptions().getOption(51).getContents());
-			int leaseTime = 10; //to simulate lease time of 10 seconds
+			int leaseTime = Utilities.convertToInt(acknowledge.getOptions().getOption(51).getContents());
+			//int leaseTime = 10; //to simulate lease time of 10 seconds
 			System.out.println("- Lease time: " + leaseTime + " seconds.");
 			socket.close();
 			long timeBeginLease = System.currentTimeMillis();
@@ -129,7 +129,7 @@ public class DHCPClient extends DHCP {
 		
 		// Negative acknowledge received, reconfiguration
 		else {
-			System.out.println("DCHPNACK received. Restarting the configuration.");
+			System.out.println("DCHPNAK received. Restarting the configuration.");
 			socket.close();
 			getIP();
 		}
@@ -143,7 +143,7 @@ public class DHCPClient extends DHCP {
 	public void releaseIP() throws UnknownHostException, IOException {
 		DatagramSocket socket = new DatagramSocket();
 		//UDP client = new UDP(InetAddress.getByName("10.33.14.246"), 1234);
-		UDP client = new UDP(InetAddress.getByName("localhost"), 1600);
+		UDP client = new UDP(InetAddress.getByName("localhost"), 1602);
 		
 		DHCPRelease(client, socket);
 		setCiaddr(null);
@@ -161,7 +161,7 @@ public class DHCPClient extends DHCP {
 		System.out.println("LEASE RENEWAL STARTED.");
 		DatagramSocket socket = new DatagramSocket();
 		//UDP client = new UDP(InetAddress.getByName("10.33.14.246"), 1234);
-		UDP client = new UDP(InetAddress.getByName("localhost"), 1600);
+		UDP client = new UDP(InetAddress.getByName("localhost"), 1602);
 		
 		Message ack = DHCPRequest(Utilities.generateXid(), getCiaddr(), siaddr, client, socket);
 		setCiaddr(ack.getYiaddr());

@@ -23,7 +23,7 @@ public class DHCPDiscoverMessage extends Message {
 	public DHCPDiscoverMessage(String macAddress) throws IllegalArgumentException, UnknownHostException {
 		super(1,1,6,0, Utilities.generateXid(), 0, FLAGS1, InetAddress.getByName("0.0.0.0"), InetAddress.getByName("0.0.0.0"), InetAddress.getByName("0.0.0.0"), InetAddress.getByName("0.0.0.0"), macAddress, "", "", null);
 		Option option53 = new Option(53, Utilities.convertToByteArray(1, 1));
-		Option option50 = new Option(50, InetAddress.getByName("0.0.0.0").getAddress());
+		Option option50 = new Option(50, InetAddress.getByName("192.168.100.166").getAddress());
 		Option option57 = new Option(57, Utilities.convertToByteArray(2, Message.MESSAGE_SIZE));
 		Option option255 = new Option(255, new byte[0]);
 		OptionsList optionsList = new OptionsList(option53, option50, option57, option255);

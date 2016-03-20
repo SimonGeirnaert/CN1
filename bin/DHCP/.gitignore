@@ -15,3 +15,8 @@
 /DHCPServer.class
 /DHCP.class
 /mainServer.class
+/mainClient.class
+/IPAddress.class
+/DHCPAckMessage.class
+/DHCPNackMessage.class
+/DHCPNakMessage.class

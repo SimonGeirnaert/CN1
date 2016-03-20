@@ -8,9 +8,6 @@ import java.net.UnknownHostException;
 
 public abstract class DHCP {
 	
-	public static final int SERVER_PORT = 1600;
-	public static final int CLIENT_PORT = 1600;
-	
 	/**
 	 * Creates a UDP message in DHCP format with all given fields and sends it to the server.
 	 * 
