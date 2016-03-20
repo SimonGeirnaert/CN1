@@ -2,7 +2,6 @@ package DHCP;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 
 /**
  * Class representing a DHCP Server.
@@ -12,6 +11,24 @@ import java.util.ArrayList;
  *
  */
 public class DHCPServer extends DHCP {
+	
+	/**********************************************************
+	 * Constructor
+	 **********************************************************/
+
+	/**
+	 * Initialize a new DHCP server.
+	 * 
+	 * @param serverIP
+	 *        The IP at which the server can be reached.
+	 *        
+	 * @throws UnknownHostException 
+	 */
+	public DHCPServer(InetAddress serverIP, int lease) throws UnknownHostException{
+		setServerIP(serverIP);
+		setLeaseTime(lease);
+		this.pool = new IPPool(POOL_IP_PREFIX, IP_FIRST, IP_LAST);
+	}
 	
 	/**********************************************************
 	 * Server IP
@@ -43,9 +60,14 @@ public class DHCPServer extends DHCP {
 	 * Lease time
 	 **********************************************************/
 	
+	/**
+	 * Variable representing the lease time.
+	 */
 	private int leaseTime = 0;
 	
 	/**
+	 * Return the lease time;
+	 * 
 	 * @return The server lease time.
 	 */
 	public int getLeaseTime() {
@@ -57,6 +79,7 @@ public class DHCPServer extends DHCP {
 	 * 
 	 * @param leaseTime
 	 *        The lease time to set
+	 * @pre   The given lease time has to be positive.
 	 */
 	private void setLeaseTime(int leaseTime) {
 		this.leaseTime = leaseTime;
@@ -70,7 +93,7 @@ public class DHCPServer extends DHCP {
 	/**
 	 * Variable representing the pool of IP addresses the server can issue.
 	 */
-	ArrayList<IPAddress> pool = new ArrayList<IPAddress>();
+	IPPool pool = null;
 	
 	/**
 	 * Constant representing the first part of all pool IP addresses.
@@ -88,139 +111,12 @@ public class DHCPServer extends DHCP {
 	private static final int IP_LAST = 200;
 	
 	/**
+	 * Return the pool of IP addresses
+	 * 
 	 * @return The pool of IP addresses.
 	 */
-	public ArrayList<IPAddress> getPool() {
+	public IPPool getPool() {
 		return pool;
-	}
-
-//	/**
-//	 * Sets the pool of IP addresses.
-//	 * 
-//	 * @param pool
-//	 *        The pool of IP addresses to set.
-//	 */
-//	private void setPool(ArrayList<IPAddress> pool) {
-//		this.pool = pool;
-//	}
-	
-	/**
-	 * Adds a given IP address to the pool of IP addresses.
-	 * 
-	 * @param ip
-	 *        The IP to add to the pool.
-	 */
-	private void addToPool(InetAddress ip){
-		getPool().add(new IPAddress(ip));
-	}
-	
-	/**
-	 * Checks if an IP address is in the pool and available.
-	 * 
-	 * @param ip
-	 *        The IP to check
-	 *        
-	 * @return True if the IP is in the pool and is not yet in use.
-	 */
-	public boolean isInPool(InetAddress ip){
-		for(int i =0; i<getPool().size(); i++){
-			if(getPool().get(i).getIpAddr().equals(ip) && getPool().get(i).isLeased()==false)
-				return true;
-		}
-		return false;
-	}
-	
-	/**
-	 * Gets an available IP address.
-	 * 
-	 * @return An available IP address.
-	 * 
-	 * @throws Exception
-	 *         When no IP addresses are available.
-	 */
-	public InetAddress getAvailableAddress() throws Exception {
-		for(int i=0; i<getPool().size(); i++){
-			if(getPool().get(i).isLeased()==false)
-					return getPool().get(i).getIpAddr();
-		}
-		throw new Exception("There are currently no IP addresses available.");
-	}
-	
-	/**
-	 * Returns the IP address in use by the client with the give MAC address.
-	 * 
-	 * @param macAddr
-	 *        The MAC address of the client of which the IP should be returned.
-	 *        
-	 * @return The IP address in use by the client with the give MAC address.
-	 */
-	private InetAddress getIPByMacAddr(String macAddr){
-		for(int i=0; i<getPool().size(); i++){
-			if(getPool().get(i).getMacAddr().equals(macAddr))
-					return getPool().get(i).getIpAddr();
-		}
-		throw new IllegalArgumentException("The given MAC address has no active lease.");
-	}
-	
-	/**
-	 * Creates a pool of IP addresses.
-	 *        
-	 * @throws UnknownHostException 
-	 */
-	private void createPool() throws UnknownHostException{
-		for(int i = IP_FIRST; i <= IP_LAST; i++){
-			addToPool(InetAddress.getByName(POOL_IP_PREFIX + i));
-		}
-	}
-	
-	/**
-	 * Returns the IPAddress from the pool for the given InetAddress.
-	 * 
-	 * @param addr
-	 *        The given InetAddress
-	 *        
-	 * @return The IPAddress if it is present in the pool, else null.
-	 */
-	private IPAddress getIPFromPool(InetAddress addr){
-		for(int i=0; i<getPool().size(); i++){
-			if(getPool().get(i).getIpAddr().equals(addr))
-				return getPool().get(i);
-		}
-		return null;
-	}
-	
-	/**
-	 * Returns the IPAddress from the pool for the given InetAddress.
-	 * 
-	 * @param addr
-	 *        The given InetAddress
-	 *        
-	 * @return The IPAddress if it is present in the pool, else null.
-	 */
-	private IPAddress getIPFromPoolByMacAddr(String macAddr){
-		for(int i=0; i<getPool().size(); i++){
-			if(getPool().get(i).getMacAddr().equals(macAddr))
-				return getPool().get(i);
-		}
-		return null;
-	}
-	
-	/**********************************************************
-	 * Constructor
-	 **********************************************************/
-
-	/**
-	 * Initialize a new DHCP server.
-	 * 
-	 * @param serverIP
-	 *        The IP at which the server can be reached.
-	 *        
-	 * @throws UnknownHostException 
-	 */
-	public DHCPServer(InetAddress serverIP, int lease) throws UnknownHostException{
-		setServerIP(serverIP);
-		setLeaseTime(lease);
-		createPool();
 	}
 	
 	/**********************************************************
@@ -254,9 +150,9 @@ public class DHCPServer extends DHCP {
 			else if(Utilities.convertToInt(response.getOptions().getOption(53).getContents()) == 3){
 				System.out.println("DHCPREQUEST received.");
 				InetAddress offeredIP = InetAddress.getByAddress(response.getOptions().getOption(50).getContents());
-				if((isInPool(offeredIP) && getIPFromPool(offeredIP).isLeased()==false) || (offeredIP.equals(getIPByMacAddr(response.getChaddr())))){
-					getIPFromPool(offeredIP).setLeased(true);
-					getIPFromPool(offeredIP).setMacAddr(response.getChaddr());
+				if((getPool().isInPoolAndAvailable(offeredIP) && getPool().getIPFromPool(offeredIP).isLeased()==false) || (offeredIP.equals(getPool().getIPByMacAddr(response.getChaddr())))){
+					getPool().getIPFromPool(offeredIP).setLeased(true);
+					getPool().getIPFromPool(offeredIP).setMacAddr(response.getChaddr());
 					DHCPAck(response.getXid(), InetAddress.getByAddress(response.getOptions().getOption(50).getContents()), response.getChaddr(), server, socket);
 					socket.close();
 					operate();
@@ -270,7 +166,7 @@ public class DHCPServer extends DHCP {
 		} catch (IllegalArgumentException e) {
 			if(response.getYiaddr().equals(InetAddress.getByName("0.0.0.0"))) {		
 				System.out.println("DHCPRELEASE received.");
-				getIPFromPoolByMacAddr(response.getChaddr()).setLeased(false); //dont remove MAC addr from pool to make quick initialization possible
+				getPool().getIPFromPoolByMacAddr(response.getChaddr()).setLeased(false); //dont remove MAC addr from pool to make quick initialization possible
 				socket.close();
 				operate();
 			}
@@ -295,9 +191,9 @@ public class DHCPServer extends DHCP {
 	 *         When no IP addresses are available.
 	 */
 	public InetAddress getOfferIP(InetAddress requestedIP) throws Exception {
-		if(isInPool(requestedIP))
+		if(getPool().isInPoolAndAvailable(requestedIP))
 			return requestedIP;
-		else return getAvailableAddress(); 
+		else return getPool().getAvailableAddress(); 
 	}
 	
 	/**
