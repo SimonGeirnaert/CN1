@@ -3,7 +3,7 @@ package DHCP;
 import java.net.InetAddress;
 
 /**
- * Class representing a DHCP Discover message.
+ * Class representing a DHCP offer message.
  * 
  * @author Laurent De Laere
  * 		   Simon Geirnaert

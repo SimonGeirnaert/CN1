@@ -43,23 +43,23 @@ public class DHCPServer extends DHCP {
 	 * Lease time
 	 **********************************************************/
 	
-	private int lease = 0;
+	private int leaseTime = 0;
 	
 	/**
 	 * @return The server lease time.
 	 */
-	public int getLease() {
-		return lease;
+	public int getLeaseTime() {
+		return leaseTime;
 	}
 
 	/**
 	 * Set the server lease time.
 	 * 
-	 * @param lease
+	 * @param leaseTime
 	 *        The lease time to set
 	 */
-	private void setLease(int lease) {
-		this.lease = lease;
+	private void setLeaseTime(int leaseTime) {
+		this.leaseTime = leaseTime;
 	}
 
 	
@@ -219,7 +219,7 @@ public class DHCPServer extends DHCP {
 	 */
 	public DHCPServer(InetAddress serverIP, int lease) throws UnknownHostException{
 		setServerIP(serverIP);
-		setLease(lease);
+		setLeaseTime(lease);
 		createPool();
 	}
 	
@@ -332,24 +332,22 @@ public class DHCPServer extends DHCP {
 	}
 	
 	/**
-	 * Sends a DHCPACK message to the client to confirm that the IP address is now leased to the client.
+	 * Sends a DHCPACK message to the client to confirm that 
+	 * the IP address is now leased to the client.
 	 * 
 	 * @param xid
 	 *        The transaction ID provided by the client.
-	 * @param reqIP
+	 * @param requestedIP
 	 *        The IP offered by the server.
-	 * @param macAddr
+	 * @param macAddress
 	 *        The MAC address of the client.
 	 * @param server
 	 *        The UDP connection currently in use.
 	 * @param socket
 	 *        The DatagramSocket currently in use.
-	 * 
-	 * @throws Exception
 	 */
-	private void DHCPAck(int xid, InetAddress reqIP, String macAddr, UDP server, DatagramSocket socket) throws Exception {
-		DHCPAckMessage ackMessage = new DHCPAckMessage(xid, reqIP, getServerIP(), macAddr, getLease());
-		
+	private void DHCPAck(int xid, InetAddress requestedIP, String macAddress, UDP server, DatagramSocket socket) throws Exception {
+		DHCPAckMessage ackMessage = new DHCPAckMessage(xid, requestedIP, this.getServerIP(), macAddress, this.getLeaseTime());
 		System.out.println("DHCPACK sent.");
 		sendUDPMessageWithoutResponse(ackMessage, server, socket);
 	}
@@ -359,19 +357,15 @@ public class DHCPServer extends DHCP {
 	 * 
 	 * @param xid
 	 *        The transaction ID provided by the client.
-	 * @param reqIP
-	 *        The IP offered by the server.
-	 * @param macAddr
+	 * @param macAddress
 	 *        The MAC address of the client.
 	 * @param server
 	 *        The UDP connection currently in use.
 	 * @param socket
 	 *        The DatagramSocket currently in use.
-	 *        
-	 * @throws Exception
 	 */
-	private void DHCPNak(int xid, String macAddr, UDP server, DatagramSocket socket) throws Exception {
-		DHCPNakMessage nakMessage = new DHCPNakMessage(xid, macAddr);
+	private void DHCPNak(int xid, String macAddress, UDP server, DatagramSocket socket) throws Exception {
+		DHCPNakMessage nakMessage = new DHCPNakMessage(xid, macAddress);
 		System.out.println("DHCPNAK sent.");
 		sendUDPMessageWithoutResponse(nakMessage, server, socket);
 	}
