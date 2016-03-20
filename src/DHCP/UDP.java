@@ -17,6 +17,19 @@ import java.net.UnknownHostException;
 public class UDP {
 	
 	/**
+	 * Constant referencing the packet size.
+	 */
+	private static final int PACKETSIZE = 576;
+	
+	/**
+	 * Initialize the new UPD client.
+	 */
+	public UDP(InetAddress receiver, int port) {
+		setReceiverIP(receiver);
+		setDestinationPort(port);
+	}
+	
+	/**
 	 * Constant referencing the IP address of the receiver of UDP messages sent with this UDP object.
 	 */
 	private InetAddress receiverIP = null;	
@@ -60,18 +73,6 @@ public class UDP {
 		this.destinationPort = destinationPort;
 	}
 
-	/**
-	 * Constant referencing the packet size.
-	 */
-	private static final int PACKETSIZE = 576;
-	
-	/**
-	 * Initialize the new UPD client.
-	 */
-	public UDP(InetAddress receiver, int port) {
-		setReceiverIP(receiver);
-		setDestinationPort(port);
-	}
 
 	/**
 	 * Send data to UDP server.
