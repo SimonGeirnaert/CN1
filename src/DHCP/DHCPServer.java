@@ -138,7 +138,7 @@ public class DHCPServer extends DHCP {
 	 * @throws Exception
 	 *         When no IP addresses are available.
 	 */
-	public InetAddress getAvailableAddress() throws Exception{
+	public InetAddress getAvailableAddress() throws Exception {
 		for(int i=0; i<getPool().size(); i++){
 			if(getPool().get(i).isLeased()==false)
 					return getPool().get(i).getIpAddr();
@@ -294,7 +294,7 @@ public class DHCPServer extends DHCP {
 	 * @throws Exception
 	 *         When no IP addresses are available.
 	 */
-	public InetAddress getOfferIP(InetAddress requestedIP) throws Exception{
+	public InetAddress getOfferIP(InetAddress requestedIP) throws Exception {
 		if(isInPool(requestedIP))
 			return requestedIP;
 		else return getAvailableAddress(); 
@@ -305,9 +305,9 @@ public class DHCPServer extends DHCP {
 	 * 
 	 * @param xid
 	 *        The transaction ID used by the client for DHCPDISCOVER.
-	 * @param reqIP
+	 * @param requestedIP
 	 *        The requested IP by the client.
-	 * @param macAddr
+	 * @param macAddress
 	 *        The MAC address of the client.
 	 * @param server
 	 *        The UDP connection currently in use by the server.
@@ -315,14 +315,20 @@ public class DHCPServer extends DHCP {
 	 *        The DatagramSocket currently in use.
 	 *        
 	 * @return The response from the client.
-	 * @throws Exception 
 	 */
-	private Message DHCPOffer(int xid, InetAddress reqIP, String macAddr, UDP server, DatagramSocket socket) throws Exception {
-		DHCPOfferMessage offerMessage = new DHCPOfferMessage(xid, reqIP, getServerIP(), macAddr, this);
-		
-		System.out.println("DHCPOFFER sent.");
-		Message response = sendUDPMessage(offerMessage, server, socket);
-		return response;
+	private Message DHCPOffer(int xid, InetAddress requestedIP, String macAddress, UDP server, DatagramSocket socket) {
+		try {
+			InetAddress offerIP = this.getOfferIP(requestedIP);
+			InetAddress serverIP = server.getReceiverIP();
+			DHCPOfferMessage offerMessage = new DHCPOfferMessage(xid, offerIP, macAddress, serverIP);
+			
+			System.out.println("DHCPOFFER sent.");
+			Message response = sendUDPMessage(offerMessage, server, socket);
+			return response;
+		}
+		catch (Exception excep) {
+			return DHCPOffer(xid, requestedIP, macAddress, server, socket);
+		}
 	}
 	
 	/**
