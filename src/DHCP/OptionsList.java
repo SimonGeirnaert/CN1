@@ -1,6 +1,8 @@
 package DHCP;
+
 /**
- * Class representing the options field of a DHCP message. Contains all the different options.
+ * Class representing the options field of a DHCP message. 
+ * Contains all the different options.
  * 
  * @author Laurent De Laere
  * 		   Simon Geirnaert
@@ -14,8 +16,10 @@ public class OptionsList {
 	Option[] options = null;
 	
 	/**
+	 * Initialize the options list with given options.
 	 * 
 	 * @param options
+	 * 		  The options to add to the list.
 	 */
 	public OptionsList(Option ... options){
 		setOptions(options);
