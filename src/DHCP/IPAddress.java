@@ -17,7 +17,7 @@ public class IPAddress {
 	 * 		  The InetAddress to initialize the new IPAddress with.
 	 */
 	public IPAddress(InetAddress ip){
-		setIpAddr(ip);
+		setIpAddress(ip);
 	}
 	
 	/**
@@ -30,7 +30,7 @@ public class IPAddress {
 	 * 
 	 * @return The IP address.
 	 */
-	public InetAddress getIpAddr() {
+	public InetAddress getIpAddress() {
 		return ipAddress;
 	}
 
@@ -40,7 +40,7 @@ public class IPAddress {
 	 * @param ipAddr
 	 *        The IP to set.
 	 */
-	private void setIpAddr(InetAddress ipAddr) {
+	private void setIpAddress(InetAddress ipAddr) {
 		this.ipAddress = ipAddr;
 	}
 
@@ -74,7 +74,7 @@ public class IPAddress {
 	/**
 	 * @return The hardware address of the client using this IP.
 	 */
-	public String getMacAddr() {
+	public String getMacAddress() {
 		return macAddress;
 	}
 
@@ -84,7 +84,7 @@ public class IPAddress {
 	 * @param macAddress
      *        The hardware address to set.
 	 */
-	public void setMacAddr(String macAddress) {
+	public void setMacAddress(String macAddress) {
 		this.macAddress = macAddress;
 	}
 	
