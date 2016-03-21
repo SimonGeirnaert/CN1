@@ -94,12 +94,10 @@ public class DHCPClient extends DHCPHost {
 	
 	/**
 	 * Gets an IP for the client. If the lease time for the IP address is expired, renewing the lease.
-	 * 
 	 */
 	public void getIP() throws IllegalArgumentException, SocketException, IOException{
 		// Initialize connection sockets and settings
 		DatagramSocket socket = new DatagramSocket();
-		//UDP client = new UDP(InetAddress.getByName("10.33.14.246"), 1234);
 		UDPHost client = new UDPHost(InetAddress.getByName("localhost"), 1602);
 		
 		// Discover
