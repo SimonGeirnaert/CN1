@@ -61,7 +61,7 @@ public class IPPool {
 	public InetAddress getAvailableAddress() throws Exception {
 		for(int i=0; i<getPool().size(); i++){
 			if(!getPool().get(i).isLeased())
-					return getPool().get(i).getIpAddr();
+					return getPool().get(i).getIpAddress();
 		}
 		throw new Exception("There are currently no IP addresses available.");
 	}
@@ -76,57 +76,43 @@ public class IPPool {
 	 */
 	public boolean isInPoolAndAvailable(InetAddress ip){
 		for(int i =0; i<getPool().size(); i++){
-			if(getPool().get(i).getIpAddr().equals(ip) && !getPool().get(i).isLeased())
+			if(getPool().get(i).getIpAddress().equals(ip) && !getPool().get(i).isLeased())
 				return true;
 		}
 		return false;
 	}
 	
 	/**
-	 * Returns the IP address in use by the client with the give MAC address.
+	 * Returns the IP address from the pool for the given InetAddress.
+	 * 
+	 * @param address
+	 *        The given InetAddress
+	 *        
+	 * @return The IPAddress if it is present in the pool, else null.
+	 */
+	public IPAddress getIPFromPool(InetAddress address){
+		for(int i=0; i<getPool().size(); i++){
+			if(getPool().get(i).getIpAddress().equals(address))
+				return getPool().get(i);
+		}
+		return null;
+	}
+	
+	/**
+	 * Returns the IP address from the pool for the given MAC address.
 	 * 
 	 * @param macAddress
-	 *        The MAC address of the client of which the IP should be returned.
+	 *        The given MAC address of the client.
 	 *        
-	 * @return The IP address in use by the client with the give MAC address.
+	 * @return The IP address matching the given MAC address
+	 * @throws IllegalArgumentException
+	 * 		   The given MAC address has no active lease.
 	 */
-	public InetAddress getIPByMacAddr(String macAddress){
+	public IPAddress getIPByMacAddress(String macAddress){
 		for(int i=0; i<getPool().size(); i++){
-			if(getPool().get(i).getMacAddr().equals(macAddress))
-					return getPool().get(i).getIpAddr();
+			if(getPool().get(i).getMacAddress().equals(macAddress))
+				return getPool().get(i);
 		}
 		throw new IllegalArgumentException("The given MAC address has no active lease.");
-	}
-	
-	/**
-	 * Returns the IPAddress from the pool for the given InetAddress.
-	 * 
-	 * @param addr
-	 *        The given InetAddress
-	 *        
-	 * @return The IPAddress if it is present in the pool, else null.
-	 */
-	public IPAddress getIPFromPool(InetAddress addr){
-		for(int i=0; i<getPool().size(); i++){
-			if(getPool().get(i).getIpAddr().equals(addr))
-				return getPool().get(i);
-		}
-		return null;
-	}
-	
-	/**
-	 * Returns the IPAddress from the pool for the given InetAddress.
-	 * 
-	 * @param addr
-	 *        The given InetAddress
-	 *        
-	 * @return The IPAddress if it is present in the pool, else null.
-	 */
-	public IPAddress getIPFromPoolByMacAddr(String macAddr){
-		for(int i=0; i<getPool().size(); i++){
-			if(getPool().get(i).getMacAddr().equals(macAddr))
-				return getPool().get(i);
-		}
-		return null;
 	}
 }
