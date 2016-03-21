@@ -31,4 +31,6 @@ Algemeen voor setters en constructoren: eens kijken naar precondities?
 *DHCPServer: IPPool: 2x getIpByMacAddress?
 	     - in operate: telkens nieuwe socket openen is helemaal niet efficiënt
 
+Wat als de lease time al voorbij is en de server krijgt geen nieuwe request?
+
 		
