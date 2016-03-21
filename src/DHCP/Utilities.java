@@ -115,9 +115,9 @@ public abstract class Utilities {
 	}
 
 	/**
-	 * Generates a random int to use as transaction ID.
+	 * Generates a random integer to use as transaction ID.
 	 * 
-	 * @return A random int.
+	 * @return A random integer.
 	 */
 	public static int generateXid() {
 		return ThreadLocalRandom.current().nextInt();
