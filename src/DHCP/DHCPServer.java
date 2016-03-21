@@ -26,12 +26,12 @@ public class DHCPServer extends DHCPHost {
 	 * 
 	 * @param serverIP
 	 *        The IP at which the server can be reached.
-	 *        
-	 * @throws UnknownHostException 
+	 * @param leaseTime
+	 * 		  The lease time (in seconds).
 	 */
-	public DHCPServer(InetAddress serverIP, int lease) throws UnknownHostException{
+	public DHCPServer(InetAddress serverIP, int leaseTime) throws UnknownHostException{
 		setServerIP(serverIP);
-		setLeaseTime(lease);
+		setLeaseTime(leaseTime);
 		this.pool = new IPPool(POOL_IP_PREFIX, IP_FIRST, IP_LAST);
 	}
 	
@@ -144,15 +144,30 @@ public class DHCPServer extends DHCPHost {
 		operate();
 	}
 	
-	
+	/**
+	 * Handle a response of the client and return normal operation.
+	 * 
+	 * @param response
+	 * 		  The response of the client.
+	 * @param server
+	 * 		  The UDP server.
+	 * @param socket
+	 * 		  The bidirectional connection socket;
+	 */
 	private void handleResponse(Message response, UDPHost server, DatagramSocket socket) throws Exception{
 		try{
 			// DHCPDiscover received
 			if(Utilities.convertToInt(response.getOptions().getOption(53).getContents()) == 1) {
 				System.out.println("DHCPDISCOVER received.");
 				InetAddress requestedIP = InetAddress.getByAddress(response.getOptions().getOption(50).getContents());	
+				// If the client has already an IP in use: don't answer
+				if(this.clientHasAlreadyIP(response.getChaddr())) {
+					System.out.println("Client has already IP; waiting for release.");
+					socket.close();
+					operate();
+				}
 				try {
-				handleResponse(DHCPOffer(response.getXid(), requestedIP, response.getChaddr(), server, socket), server, socket);
+					handleResponse(DHCPOffer(response.getXid(), requestedIP, response.getChaddr(), server, socket), server, socket);
 				}
 				catch(Exception ex) {
 					// Do nothing
@@ -162,9 +177,9 @@ public class DHCPServer extends DHCPHost {
 			else if(Utilities.convertToInt(response.getOptions().getOption(53).getContents()) == 3){
 				System.out.println("DHCPREQUEST received.");
 				InetAddress offeredIP = InetAddress.getByAddress(response.getOptions().getOption(50).getContents());
-				if((getPool().isInPoolAndAvailable(offeredIP) && !getPool().getIPFromPool(offeredIP).isLeased()) || (offeredIP.equals(getPool().getIPByMacAddr(response.getChaddr())))){
+				if((getPool().isInPoolAndAvailable(offeredIP) && !getPool().getIPFromPool(offeredIP).isLeased()) || (offeredIP.equals(getPool().getIPByMacAddress(response.getChaddr()).getIpAddress()))){
 					getPool().getIPFromPool(offeredIP).setLeased(true);
-					getPool().getIPFromPool(offeredIP).setMacAddr(response.getChaddr());
+					getPool().getIPFromPool(offeredIP).setMacAddress(response.getChaddr());
 					DHCPAck(response.getXid(), InetAddress.getByAddress(response.getOptions().getOption(50).getContents()), response.getChaddr(), server, socket);
 					socket.close();
 					operate();
@@ -178,7 +193,7 @@ public class DHCPServer extends DHCPHost {
 		} catch (IllegalArgumentException e) {
 			if(response.getYiaddr().equals(InetAddress.getByName("0.0.0.0"))) {		
 				System.out.println("DHCPRELEASE received.");
-				getPool().getIPFromPoolByMacAddr(response.getChaddr()).setLeased(false); //dont remove MAC addr from pool to make quick initialization possible
+				getPool().getIPByMacAddress(response.getChaddr()).setLeased(false); //dont remove MAC addr from pool to make quick initialization possible
 				socket.close();
 				operate();
 			}
@@ -288,5 +303,22 @@ public class DHCPServer extends DHCPHost {
 		DHCPNakMessage nakMessage = new DHCPNakMessage(xid, macAddress);
 		System.out.println("DHCPNAK sent.");
 		sendUDPMessageWithoutResponse(nakMessage, server, socket);
+	}
+	
+	/**
+	 * Check whether a client has already an IP address in use.
+	 * 
+	 * @param macAddress
+	 * 	 	  The MAC address of the client to check.
+	 * @return True if the client has already an IP address in use;
+	 * 		   false otherwise.
+	 */
+	private boolean clientHasAlreadyIP(String macAddress) {
+		try {
+			this.getPool().getIPByMacAddress(macAddress);
+			return true;
+		} catch(IllegalArgumentException e) {
+			return false;
+		}
 	}
 }
