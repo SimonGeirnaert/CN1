@@ -1,6 +1,8 @@
-package DHCP;
+package DHCP.Main;
 
 import java.net.InetAddress;
+
+import DHCP.DHCPServer;
 
 public class mainServer {
 

@@ -14,7 +14,7 @@ import java.net.UnknownHostException;
  * 		   Simon Geirnaert
  *
  */
-public class UDP {
+public class UDPHost {
 	
 	/**
 	 * Constant referencing the packet size.
@@ -24,7 +24,7 @@ public class UDP {
 	/**
 	 * Initialize the new UPD client.
 	 */
-	public UDP(InetAddress receiver, int port) {
+	public UDPHost(InetAddress receiver, int port) {
 		setReceiverIP(receiver);
 		setDestinationPort(port);
 	}

@@ -1,4 +1,6 @@
-package DHCP;
+package DHCP.Message;
+
+import DHCP.Utilities;
 
 /**
  * Class representing an option of a DHCP message.

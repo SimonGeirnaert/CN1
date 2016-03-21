@@ -5,6 +5,11 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
+import DHCP.Message.DHCPDiscoverMessage;
+import DHCP.Message.DHCPReleaseMessage;
+import DHCP.Message.DHCPRequestMessage;
+import DHCP.Message.Message;
+
 /**
  * Class representing a DHCP Client.
  * 
@@ -12,7 +17,7 @@ import java.net.UnknownHostException;
  * 		   Simon Geirnaert
  *
  */
-public class DHCPClient extends DHCP {
+public class DHCPClient extends DHCPHost {
 	
 	/**********************************************************
 	 * Client MAC address
@@ -95,7 +100,7 @@ public class DHCPClient extends DHCP {
 		// Initialize connection sockets and settings
 		DatagramSocket socket = new DatagramSocket();
 		//UDP client = new UDP(InetAddress.getByName("10.33.14.246"), 1234);
-		UDP client = new UDP(InetAddress.getByName("localhost"), 1602);
+		UDPHost client = new UDPHost(InetAddress.getByName("localhost"), 1602);
 		
 		// Discover
 		Message offer = DHCPDiscover(client, socket);
@@ -143,7 +148,7 @@ public class DHCPClient extends DHCP {
 	public void releaseIP() throws UnknownHostException, IOException {
 		DatagramSocket socket = new DatagramSocket();
 		//UDP client = new UDP(InetAddress.getByName("10.33.14.246"), 1234);
-		UDP client = new UDP(InetAddress.getByName("localhost"), 1602);
+		UDPHost client = new UDPHost(InetAddress.getByName("localhost"), 1602);
 		
 		DHCPRelease(client, socket);
 		setCiaddr(null);
@@ -161,7 +166,7 @@ public class DHCPClient extends DHCP {
 		System.out.println("LEASE RENEWAL STARTED.");
 		DatagramSocket socket = new DatagramSocket();
 		//UDP client = new UDP(InetAddress.getByName("10.33.14.246"), 1234);
-		UDP client = new UDP(InetAddress.getByName("localhost"), 1602);
+		UDPHost client = new UDPHost(InetAddress.getByName("localhost"), 1602);
 		
 		Message ack = DHCPRequest(Utilities.generateXid(), getCiaddr(), siaddr, client, socket);
 		setCiaddr(ack.getYiaddr());
@@ -182,7 +187,7 @@ public class DHCPClient extends DHCP {
 	 * 
 	 * @return The response of the server.
 	 */
-	private Message DHCPDiscover(UDP client, DatagramSocket socket) throws IllegalArgumentException, SocketException, IOException {
+	private Message DHCPDiscover(UDPHost client, DatagramSocket socket) throws IllegalArgumentException, SocketException, IOException {
 		DHCPDiscoverMessage discoverMessage = new DHCPDiscoverMessage(getMacAddress());
 		
 		System.out.println("DHCPDISCOVER sent.");
@@ -206,7 +211,7 @@ public class DHCPClient extends DHCP {
 	 *        
 	 * @return The reply from the server.
 	 */
-	private Message DHCPRequest(int transactionID, InetAddress offeredAddress, InetAddress serverAddress, UDP client, DatagramSocket socket) throws SocketException, IOException{
+	private Message DHCPRequest(int transactionID, InetAddress offeredAddress, InetAddress serverAddress, UDPHost client, DatagramSocket socket) throws SocketException, IOException{
 		DHCPRequestMessage requestMessage = new DHCPRequestMessage(transactionID, getMacAddress(), offeredAddress, serverAddress);
 		
 		System.out.println("DHCPREQUEST sent to request IP " + offeredAddress.toString()+" at server " + serverAddress.toString());
@@ -224,7 +229,7 @@ public class DHCPClient extends DHCP {
 	 *        
 	 * @post  The client has no IP address.
 	 */
-	private void DHCPRelease(UDP client, DatagramSocket socket) throws UnknownHostException, SocketException, IOException{
+	private void DHCPRelease(UDPHost client, DatagramSocket socket) throws UnknownHostException, SocketException, IOException{
 		DHCPReleaseMessage releaseMessage = new DHCPReleaseMessage(getMacAddress());
 		sendUDPMessageWithoutResponse(releaseMessage, client, socket);
 		this.setCiaddr(null);

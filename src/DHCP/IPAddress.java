@@ -3,13 +3,19 @@ package DHCP;
 import java.net.InetAddress;
 
 /**
- * Class representing an IP address for the server to issue and keeps track of the MAC address using it..
+ * Class representing an IP address for the server to issue and keeps track of the MAC address using it.
  * 
  * @author Simon Geirnaert
  *         Laurent De Laere
  */
 public class IPAddress {
 	
+	/**
+	 * Initialize the new IPAddress with given InetAddress
+	 * 
+	 * @param ip
+	 * 		  The InetAddress to initialize the new IPAddress with.
+	 */
 	public IPAddress(InetAddress ip){
 		setIpAddr(ip);
 	}
@@ -17,13 +23,15 @@ public class IPAddress {
 	/**
 	 * Variable representing the IP address.
 	 */
-	private InetAddress ipAddr = null;
+	private InetAddress ipAddress = null;
 	
 	/**
+	 * Return the InetAddress of this IPAddress.
+	 * 
 	 * @return The IP address.
 	 */
 	public InetAddress getIpAddr() {
-		return ipAddr;
+		return ipAddress;
 	}
 
 	/**
@@ -32,8 +40,8 @@ public class IPAddress {
 	 * @param ipAddr
 	 *        The IP to set.
 	 */
-	public void setIpAddr(InetAddress ipAddr) {
-		this.ipAddr = ipAddr;
+	private void setIpAddr(InetAddress ipAddr) {
+		this.ipAddress = ipAddr;
 	}
 
 	/**
@@ -61,23 +69,23 @@ public class IPAddress {
 	/**
 	 * Variable representing the hardware address of the client using this IP
 	 */
-	private String macAddr = "";
+	private String macAddress = "";
 
 	/**
 	 * @return The hardware address of the client using this IP.
 	 */
 	public String getMacAddr() {
-		return macAddr;
+		return macAddress;
 	}
 
 	/**
 	 * Sets the hardware address of the client using this IP.
 	 * 
-	 * @param macAddr
+	 * @param macAddress
      *        The hardware address to set.
 	 */
-	public void setMacAddr(String macAddr) {
-		this.macAddr = macAddr;
+	public void setMacAddr(String macAddress) {
+		this.macAddress = macAddress;
 	}
 	
 	

@@ -1,7 +1,9 @@
-package DHCP;
+package DHCP.Message;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+
+import DHCP.Utilities;
 
 /**
  * A class representing a DHCP message.

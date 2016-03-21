@@ -3,6 +3,11 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import DHCP.Message.DHCPAckMessage;
+import DHCP.Message.DHCPNakMessage;
+import DHCP.Message.DHCPOfferMessage;
+import DHCP.Message.Message;
+
 /**
  * Class representing a DHCP Server.
  * 
@@ -10,7 +15,7 @@ import java.net.UnknownHostException;
  *         Laurent De Laere
  *
  */
-public class DHCPServer extends DHCP {
+public class DHCPServer extends DHCPHost {
 	
 	/**********************************************************
 	 * Constructor
@@ -127,7 +132,7 @@ public class DHCPServer extends DHCP {
 	 * Simulates normal operation of the server.
 	 */
 	public void operate() throws Exception {
-		UDP server = new UDP(InetAddress.getByName("localhost"), 0);
+		UDPHost server = new UDPHost(InetAddress.getByName("localhost"), 0);
 		DatagramSocket socket = new DatagramSocket(1602);
 		ReceivedData rcvd = server.receiveData(socket);
 		Message incomingMessage = Message.convertToMessage(rcvd.getData());
@@ -140,17 +145,24 @@ public class DHCPServer extends DHCP {
 	}
 	
 	
-	private void handleResponse(Message response, UDP server, DatagramSocket socket) throws Exception{
+	private void handleResponse(Message response, UDPHost server, DatagramSocket socket) throws Exception{
 		try{
+			// DHCPDiscover received
 			if(Utilities.convertToInt(response.getOptions().getOption(53).getContents()) == 1) {
 				System.out.println("DHCPDISCOVER received.");
-				InetAddress reqIP = InetAddress.getByAddress(response.getOptions().getOption(50).getContents());	
-				handleResponse(DHCPOffer(response.getXid(), reqIP, response.getChaddr(), server, socket), server, socket);
+				InetAddress requestedIP = InetAddress.getByAddress(response.getOptions().getOption(50).getContents());	
+				try {
+				handleResponse(DHCPOffer(response.getXid(), requestedIP, response.getChaddr(), server, socket), server, socket);
+				}
+				catch(Exception ex) {
+					// Do nothing
+				}
 			}
+			// DHCPRequest received
 			else if(Utilities.convertToInt(response.getOptions().getOption(53).getContents()) == 3){
 				System.out.println("DHCPREQUEST received.");
 				InetAddress offeredIP = InetAddress.getByAddress(response.getOptions().getOption(50).getContents());
-				if((getPool().isInPoolAndAvailable(offeredIP) && getPool().getIPFromPool(offeredIP).isLeased()==false) || (offeredIP.equals(getPool().getIPByMacAddr(response.getChaddr())))){
+				if((getPool().isInPoolAndAvailable(offeredIP) && !getPool().getIPFromPool(offeredIP).isLeased()) || (offeredIP.equals(getPool().getIPByMacAddr(response.getChaddr())))){
 					getPool().getIPFromPool(offeredIP).setLeased(true);
 					getPool().getIPFromPool(offeredIP).setMacAddr(response.getChaddr());
 					DHCPAck(response.getXid(), InetAddress.getByAddress(response.getOptions().getOption(50).getContents()), response.getChaddr(), server, socket);
@@ -179,6 +191,8 @@ public class DHCPServer extends DHCP {
 		}
 	}
 	
+	private static final double PORTION_TIME_WAITING = 0.5;
+	
 	/**
 	 * Returns the requested IP if available, returns a random available IP if the requested IP is not available.
 	 * 
@@ -191,9 +205,24 @@ public class DHCPServer extends DHCP {
 	 *         When no IP addresses are available.
 	 */
 	public InetAddress getOfferIP(InetAddress requestedIP) throws Exception {
-		if(getPool().isInPoolAndAvailable(requestedIP))
-			return requestedIP;
-		else return getPool().getAvailableAddress(); 
+		long timeBeginSearch = System.currentTimeMillis();
+		InetAddress offerIP = null;
+		while(System.currentTimeMillis() - timeBeginSearch < PORTION_TIME_WAITING*this.getLeaseTime() && offerIP == null){
+			if(getPool().isInPoolAndAvailable(requestedIP))
+				offerIP = requestedIP;
+			else {
+				try {
+					offerIP = getPool().getAvailableAddress();
+				}
+				catch(Exception ex) {
+					// Do nothing
+				}
+			}
+		}
+		if(offerIP == null)
+			throw new Exception("No offer IP founded in time.");
+		else
+			return offerIP;
 	}
 	
 	/**
@@ -212,19 +241,14 @@ public class DHCPServer extends DHCP {
 	 *        
 	 * @return The response from the client.
 	 */
-	private Message DHCPOffer(int xid, InetAddress requestedIP, String macAddress, UDP server, DatagramSocket socket) {
-		try {
-			InetAddress offerIP = this.getOfferIP(requestedIP);
-			InetAddress serverIP = server.getReceiverIP();
-			DHCPOfferMessage offerMessage = new DHCPOfferMessage(xid, offerIP, macAddress, serverIP);
+	private Message DHCPOffer(int xid, InetAddress requestedIP, String macAddress, UDPHost server, DatagramSocket socket) throws Exception {
+		InetAddress offerIP = this.getOfferIP(requestedIP);
+		InetAddress serverIP = server.getReceiverIP();
+		DHCPOfferMessage offerMessage = new DHCPOfferMessage(xid, offerIP, macAddress, serverIP);
 			
-			System.out.println("DHCPOFFER sent.");
-			Message response = sendUDPMessage(offerMessage, server, socket);
-			return response;
-		}
-		catch (Exception excep) {
-			return DHCPOffer(xid, requestedIP, macAddress, server, socket);
-		}
+		System.out.println("DHCPOFFER sent.");
+		Message response = sendUDPMessage(offerMessage, server, socket);
+		return response;
 	}
 	
 	/**
@@ -242,7 +266,7 @@ public class DHCPServer extends DHCP {
 	 * @param socket
 	 *        The DatagramSocket currently in use.
 	 */
-	private void DHCPAck(int xid, InetAddress requestedIP, String macAddress, UDP server, DatagramSocket socket) throws Exception {
+	private void DHCPAck(int xid, InetAddress requestedIP, String macAddress, UDPHost server, DatagramSocket socket) throws Exception {
 		DHCPAckMessage ackMessage = new DHCPAckMessage(xid, requestedIP, this.getServerIP(), macAddress, this.getLeaseTime());
 		System.out.println("DHCPACK sent.");
 		sendUDPMessageWithoutResponse(ackMessage, server, socket);
@@ -260,7 +284,7 @@ public class DHCPServer extends DHCP {
 	 * @param socket
 	 *        The DatagramSocket currently in use.
 	 */
-	private void DHCPNak(int xid, String macAddress, UDP server, DatagramSocket socket) throws Exception {
+	private void DHCPNak(int xid, String macAddress, UDPHost server, DatagramSocket socket) throws Exception {
 		DHCPNakMessage nakMessage = new DHCPNakMessage(xid, macAddress);
 		System.out.println("DHCPNAK sent.");
 		sendUDPMessageWithoutResponse(nakMessage, server, socket);

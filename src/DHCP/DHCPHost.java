@@ -6,7 +6,9 @@ import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
-public abstract class DHCP {
+import DHCP.Message.Message;
+
+public abstract class DHCPHost {
 	
 	/**
 	 * Creates a UDP message in DHCP format with all given fields and sends it to the server.
@@ -20,7 +22,7 @@ public abstract class DHCP {
 	 * 
 	 * @return The answer from the server as a message.
 	 */
-	protected Message sendUDPMessage(Message message, UDP client, DatagramSocket socket) throws UnknownHostException, SocketException, IOException {
+	protected Message sendUDPMessage(Message message, UDPHost client, DatagramSocket socket) throws UnknownHostException, SocketException, IOException {
 		Message response = Message.convertToMessage(client.sendData(message.convertToByteArray(), socket));
 		return waitForCorrectAnswer(message.getXid(), response, client, socket);
 	}
@@ -36,7 +38,7 @@ public abstract class DHCP {
 	 *        The DatagramSocket currently in use.
 	 * 
 	 */
-	protected void sendUDPMessageWithoutResponse(Message message, UDP client, DatagramSocket socket) throws UnknownHostException, SocketException, IOException {
+	protected void sendUDPMessageWithoutResponse(Message message, UDPHost client, DatagramSocket socket) throws UnknownHostException, SocketException, IOException {
 		client.sendDataWithoutResponse(message.convertToByteArray(), socket);
 	}
 	
@@ -56,7 +58,7 @@ public abstract class DHCP {
 	 * @return The correct reply from the server.
 	 * 
 	 */
-	protected Message waitForCorrectAnswer(int xid, Message response, UDP client, DatagramSocket socket) throws UnknownHostException, UnsupportedEncodingException, IllegalArgumentException, IOException{
+	protected Message waitForCorrectAnswer(int xid, Message response, UDPHost client, DatagramSocket socket) throws UnknownHostException, UnsupportedEncodingException, IllegalArgumentException, IOException{
 		if(isCorrectResponseMessage(xid, response)){
 			System.out.println("- Response with matching Xid ("+xid+") received.");
 			return response;

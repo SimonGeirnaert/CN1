@@ -1,6 +1,8 @@
-package DHCP;
+package DHCP.Message;
 
 import java.net.InetAddress;
+
+import DHCP.Utilities;
 
 /**
  * Class representing a DHCP offer message.
