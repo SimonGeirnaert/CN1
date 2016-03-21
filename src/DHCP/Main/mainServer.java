@@ -13,7 +13,7 @@ public class mainServer {
 	public static void main(String[] args) throws Exception {
 		DHCPServer server = new DHCPServer(InetAddress.getByName("localhost"), 10);
 		server.operate();
-
+		server.getPool().isInPoolAndAvailable(InetAddress.getByName("192.168.100.100"));
 	}
 
 }

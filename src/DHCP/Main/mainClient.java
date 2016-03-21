@@ -1,7 +1,5 @@
 package DHCP.Main;
 
-import java.net.InetAddress;
-
 import DHCP.DHCPClient;
 
 public class mainClient {
@@ -11,13 +9,16 @@ public class mainClient {
 	 * @throws Exception 
 	 */
 	public static void main(String[] args) throws Exception {
+		// Two different clients after each other: same IP
+		System.out.println("Case two seperate clients: second after release first.");
 		DHCPClient client = new DHCPClient("JH57DF98RV15FH96");
-		DHCPClient client2 = new DHCPClient("JH57DF98RV15FH95");
 		client.getIP();
-		client2.getIP();
-		client.renewLease(InetAddress.getByName("localhost"));
+		// client.renewLease(InetAddress.getByName("localhost"));
 		client.releaseIP();	
-		client2.releaseIP();
+		DHCPClient client2 = new DHCPClient("JH57DF98RV15FH95");
+		client2.getIP();
+		//client2.releaseIP();
+		client2.getIP();
 	}
 
 }
