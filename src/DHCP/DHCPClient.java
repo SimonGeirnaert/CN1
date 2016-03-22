@@ -28,12 +28,9 @@ public class DHCPClient extends DHCPHost {
 	 */
 	private String macAddress = "";
 	
-	
-	/**********************************************************
-	 * Client IP
-	 **********************************************************/
-	
 	/**
+	 * Return the MAC address of the client.
+	 * 
 	 * @return The MAC address of the client.
 	 */
 	public String getMacAddress() {
@@ -49,6 +46,10 @@ public class DHCPClient extends DHCPHost {
 		this.macAddress = macAddress;
 	}
 
+	/**********************************************************
+	 * Client IP
+	 **********************************************************/
+	
 	/**
 	 * Variable representing the client IP address.
 	 */
@@ -82,9 +83,10 @@ public class DHCPClient extends DHCPHost {
 	 * Initialize the new DHCPClient
 	 * 
 	 * @post The client has no IP address.
+	 * @post The MAC address of the client is equal to the given MAC address.
 	 */
-	public DHCPClient(String macAddr){
-		this.setMacAddress(macAddr);
+	public DHCPClient(String macAddress){
+		this.setMacAddress(macAddress);
 		this.setCiaddr(null);
 	}
 	
@@ -119,7 +121,6 @@ public class DHCPClient extends DHCPHost {
 		// Acknowledge received and waiting till lease expired to renew
 		if(Utilities.convertToInt(acknowledge.getOptions().getOption(53).getContents()) == 5) {
 			System.out.println("DHCPACK received.");
-		
 			setCiaddr(acknowledge.getYiaddr());
 			System.out.println("SYSTEM IP SET TO " + getCiaddr().toString());
 			int leaseTime = Utilities.convertToInt(acknowledge.getOptions().getOption(51).getContents());
@@ -169,7 +170,7 @@ public class DHCPClient extends DHCPHost {
 		Message ack = DHCPRequest(Utilities.generateXid(), getCiaddr(), siaddr, client, socket);
 		setCiaddr(ack.getYiaddr());
 		System.out.println("LEASE RENEWAL COMPLETE, SYSTEM IP SET TO "+ getCiaddr().toString());
-		System.out.println("- Lease time: "+Utilities.convertToInt(ack.getOptions().getOption(51).getContents())+" seconds.");
+		System.out.println("- Lease time: "+ Utilities.convertToInt(ack.getOptions().getOption(51).getContents())+ " seconds.");
 		
 		socket.close();
 	}
@@ -188,7 +189,7 @@ public class DHCPClient extends DHCPHost {
 	private Message DHCPDiscover(UDPHost client, DatagramSocket socket) throws IllegalArgumentException, SocketException, IOException {
 		DHCPDiscoverMessage discoverMessage = new DHCPDiscoverMessage(getMacAddress());
 		
-		System.out.println("DHCPDISCOVER sent.");
+		System.out.println("DHCPDISCOVER sent by " + this.getMacAddress() + ".");
 		Message response = sendUDPMessage(discoverMessage, client, socket);
 		return response;
 	}

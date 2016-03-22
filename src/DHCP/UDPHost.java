@@ -23,6 +23,9 @@ public class UDPHost {
 	
 	/**
 	 * Initialize the new UPD client.
+	 * 
+	 * @post The IP of the receiver is equal to the given IP.
+	 * @post The destination port is equal to the given port.
 	 */
 	public UDPHost(InetAddress receiver, int port) {
 		setReceiverIP(receiver);
@@ -35,6 +38,8 @@ public class UDPHost {
 	private InetAddress receiverIP = null;	
 	
 	/**
+	 * Return the IP of the receiver.
+	 * 
 	 * @return The IP address of the receiver.
 	 */
 	public InetAddress getReceiverIP() {
@@ -112,7 +117,7 @@ public class UDPHost {
 	public void sendDataWithoutResponse(byte[] sendData, DatagramSocket socket) throws UnknownHostException, IOException {
 		DatagramPacket sendPacket = new DatagramPacket(sendData, PACKETSIZE, getReceiverIP(), getDestinationPort());
 		socket.send(sendPacket);
-		}
+	}
 	
 	/**
 	 * Receives data via UDP and returns the data.
@@ -121,10 +126,8 @@ public class UDPHost {
 	 *        The socket used in the transaction
 	 *        
 	 * @return The received data
-	 * 
-	 * @throws IOException
 	 */
-	public ReceivedData receiveData(DatagramSocket socket) throws IOException{
+	public ReceivedData receiveData(DatagramSocket socket) throws IOException {
         byte[] receiveData = new byte[PACKETSIZE];
         DatagramPacket receivePacket = new DatagramPacket(receiveData, PACKETSIZE);
         socket.receive(receivePacket);

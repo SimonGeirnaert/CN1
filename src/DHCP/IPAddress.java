@@ -11,13 +11,20 @@ import java.net.InetAddress;
 public class IPAddress {
 	
 	/**
-	 * Initialize the new IPAddress with given InetAddress
+	 * Initialize the new IPAddress with given InetAddress.
 	 * 
 	 * @param ip
 	 * 		  The InetAddress to initialize the new IPAddress with.
+	 * @post The IP address is set to the given InetAddress.
+	 * @post The lease expiration time is set to zero.
+	 * @post The lease flag is set to false.
+	 * @post The MAC address is empty.
 	 */
 	public IPAddress(InetAddress ip){
-		setIpAddress(ip);
+		this.setIpAddress(ip);
+		this.setLeaseExpirationTime(0);
+		this.setLeased(false);
+		this.setMacAddress("");
 	}
 	
 	/**
@@ -91,23 +98,25 @@ public class IPAddress {
 	/**
 	 * Variable representing the server time at which the lease of this IP expires.
 	 */
-	private long leaseExpired = 0;
+	private long leaseExpirationTime = 0;
 
 	/**
+	 * Return the expiration time of the lease of this IP.
+	 * 
 	 * @return The server time at which the lease of this IP expires.
 	 */
-	public long getLeaseExpired() {
-		return leaseExpired;
+	public long getLeaseExpirationTime() {
+		return leaseExpirationTime;
 	}
 
 	/**
 	 * Sets the time at which the lease of this IP expires.
 	 * 
-	 * @param leaseExpired
-	 *        The time to set.
+	 * @param leaseExpirationTime
+	 *        The expiration time to set.
 	 */
-	 void setLeaseExpired(long leaseExpired) {
-		this.leaseExpired = leaseExpired;
+	 public void setLeaseExpirationTime(long leaseExpirationTime) {
+		this.leaseExpirationTime = leaseExpirationTime;
 	}
 	
 	

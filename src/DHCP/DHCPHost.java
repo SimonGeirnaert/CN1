@@ -36,7 +36,6 @@ public abstract class DHCPHost {
 	 *        The UDPClient currently in use.
 	 * @param socket
 	 *        The DatagramSocket currently in use.
-	 * 
 	 */
 	protected void sendUDPMessageWithoutResponse(Message message, UDPHost client, DatagramSocket socket) throws UnknownHostException, SocketException, IOException {
 		client.sendDataWithoutResponse(message.convertToByteArray(), socket);
@@ -55,12 +54,10 @@ public abstract class DHCPHost {
 	 * @param socket
 	 *        The DatagramSocket currently in use.
 	 *        
-	 * @return The correct reply from the server.
-	 * 
+	 * @return The correct reply from the server. 
 	 */
 	protected Message waitForCorrectAnswer(int xid, Message response, UDPHost client, DatagramSocket socket) throws UnknownHostException, UnsupportedEncodingException, IllegalArgumentException, IOException{
 		if(isCorrectResponseMessage(xid, response)){
-			System.out.println("- Response with matching Xid ("+xid+") received.");
 			return response;
 		}
 		else{

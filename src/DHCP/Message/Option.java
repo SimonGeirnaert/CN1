@@ -41,6 +41,8 @@ public class Option {
 	private byte[] contents = null;
 	
 	/**
+	 * Return the contents of the option.
+	 * 
 	 * @return The contents of the option.
 	 */
 	public byte[] getContents() {

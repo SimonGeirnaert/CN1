@@ -15,6 +15,8 @@ public class ReceivedData {
 	 *        The data received as a byte array.
 	 * @param port
 	 *        The port used by the sender of the data.
+	 * @post  The received data is equal to the given data.
+	 * @post  The port is equal to the given port.
 	 */
 	public ReceivedData(byte[] data, int port){
 		setData(data);
@@ -27,6 +29,8 @@ public class ReceivedData {
 	private byte[] data;
 	
 	/**
+	 * Return the received data.
+	 * 
 	 * @return The data received.
 	 */
 	public byte[] getData() {
@@ -35,6 +39,7 @@ public class ReceivedData {
 	
 	/**
 	 * Sets the data received.
+	 * 
 	 * @param data
 	 *        The data to set.
 	 */
@@ -48,6 +53,8 @@ public class ReceivedData {
 	private int port;
 	
 	/**
+	 * Return the port used by the sender of the data.
+	 * 
 	 * @return The port used by the sender of the data.
 	 */
 	public int getPort() {

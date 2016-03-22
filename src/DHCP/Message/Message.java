@@ -51,7 +51,7 @@ public class Message {
 	 * @param secs
 	 * 	      The number of seconds of the message
 	 * @param flags
-	 * 		  The flags of the message.
+	 * 		  The flags of the message
 	 * @param ciaddr
 	 * 		  The client IP address
 	 * @param yiaddr
@@ -68,7 +68,6 @@ public class Message {
 	 * 		  The file of the message
 	 * @param options
 	 * 		  The options of the message
-	 * @throws IllegalArgumentException
 	 */
 	public Message(int op, int htype, int hlen, int hops, int xid, int secs, int flags, InetAddress ciaddr, InetAddress yiaddr, InetAddress siaddr, InetAddress giaddr, String chaddr, String sname, String file, OptionsList options) throws IllegalArgumentException {
 		setOp(op);
@@ -87,8 +86,6 @@ public class Message {
 		setFile(file);
 		setOptions(options);
 	}
-	
-	
 	
 	/**********************************************************
 	 * OpCode
@@ -552,8 +549,6 @@ public class Message {
 		this.options = options;
 	}
 
-
-	
 	/**
 	 * Converts a message to bytes.
 	 * 
@@ -583,9 +578,11 @@ public class Message {
 	}
 	
 	/**
-	 * Converts bytes to a message
+	 * Converts bytes to a message.
+	 * 
 	 * @param array
-	 * @return
+	 * 		  The byte array to convert to a message.
+	 * @return The converted byte array into a message.
 	 */
 	public static Message convertToMessage(byte[] array) throws UnknownHostException, UnsupportedEncodingException, IllegalArgumentException {
 		int op = (int) array[0];

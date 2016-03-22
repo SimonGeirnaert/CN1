@@ -22,6 +22,7 @@ public class OptionsList {
 	 * 
 	 * @param options
 	 * 		  The options to add to the list.
+	 * @post  The options are equal to the given options.
 	 */
 	public OptionsList(Option ... options){
 		setOptions(options);
@@ -96,6 +97,8 @@ public class OptionsList {
 	}
 	
 	/**
+	 * Return the options of the options list.
+	 * 
 	 * @return The options of the options list.
 	 */
 	public Option[] getOptions() {
