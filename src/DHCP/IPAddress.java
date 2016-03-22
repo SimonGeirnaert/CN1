@@ -89,4 +89,16 @@ public class IPAddress {
 	}
 	
 	
+	long leaseExpired = 0;
+
+	public long getLeaseExpired() {
+		return leaseExpired;
+	}
+
+	public void setLeaseExpired(long leaseExpired) {
+		this.leaseExpired = leaseExpired;
+	}
+	
+	
+	
 }

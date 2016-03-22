@@ -15,7 +15,7 @@ import DHCP.Message.Message;
  *         Laurent De Laere
  *
  */
-public class DHCPServer extends DHCPHost {
+public class DHCPServer extends DHCPHost implements Runnable {
 	
 	/**********************************************************
 	 * Constructor
@@ -33,6 +33,8 @@ public class DHCPServer extends DHCPHost {
 		setServerIP(serverIP);
 		setLeaseTime(leaseTime);
 		this.pool = new IPPool(POOL_IP_PREFIX, IP_FIRST, IP_LAST);
+		Thread thread = new Thread(this);
+		thread.start();
 	}
 	
 	/**********************************************************
@@ -178,6 +180,7 @@ public class DHCPServer extends DHCPHost {
 				System.out.println("DHCPREQUEST received.");
 				InetAddress offeredIP = InetAddress.getByAddress(response.getOptions().getOption(50).getContents());
 				if((getPool().isInPoolAndAvailable(offeredIP) && !getPool().getIPFromPool(offeredIP).isLeased()) || (offeredIP.equals(getPool().getIPByMacAddress(response.getChaddr()).getIpAddress()))){
+					getPool().getIPFromPool(offeredIP).setLeaseExpired(System.currentTimeMillis()+getLeaseTime()*1000);
 					getPool().getIPFromPool(offeredIP).setLeased(true);
 					getPool().getIPFromPool(offeredIP).setMacAddress(response.getChaddr());
 					DHCPAck(response.getXid(), InetAddress.getByAddress(response.getOptions().getOption(50).getContents()), response.getChaddr(), server, socket);
@@ -194,6 +197,7 @@ public class DHCPServer extends DHCPHost {
 			if(response.getYiaddr().equals(InetAddress.getByName("0.0.0.0"))) {		
 				System.out.println("DHCPRELEASE received.");
 				getPool().getIPByMacAddress(response.getChaddr()).setLeased(false); //dont remove MAC addr from pool to make quick initialization possible
+				getPool().getIPByMacAddress(response.getChaddr()).setLeaseExpired(System.currentTimeMillis());
 				socket.close();
 				operate();
 			}
@@ -319,6 +323,29 @@ public class DHCPServer extends DHCPHost {
 			return true;
 		} catch(IllegalArgumentException e) {
 			return false;
+		}
+	}
+
+	/**
+	 * 
+	 */
+	public void run() {
+		try {
+			operate();
+		} catch (Exception e) {
+			System.out.println("Error occured in operation");
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	public void checkPoolLeases(){
+		for(int i=0; i<getPool().getPool().size(); i++){
+			if((getPool().getPool().get(i).getLeaseExpired() < System.currentTimeMillis()) && getPool().getPool().get(i).isLeased()){
+				getPool().getPool().get(i).setLeased(false);
+				System.out.println("Lease of client with MAC address " + getPool().getPool().get(i).getMacAddress() +" has expired.");
+			}
 		}
 	}
 }
