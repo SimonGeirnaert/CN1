@@ -16,7 +16,7 @@ public class IPPool {
 	/**
 	 * Variable representing a list of IP addresses.
 	 */
-	ArrayList<IPAddress> pool = new ArrayList<IPAddress>();
+	ArrayList<IPAddress> ipPool = new ArrayList<IPAddress>();
 
 	/**
 	 * Initialize the pool of IP addresses with given 
@@ -38,7 +38,7 @@ public class IPPool {
 	 *        The IP to add to the pool.
 	 */
 	private void addToPool(InetAddress ip){
-		this.getPool().add(new IPAddress(ip));
+		this.getIpPool().add(new IPAddress(ip));
 	}
 	
 	/**
@@ -46,8 +46,17 @@ public class IPPool {
 	 * 
 	 * @return The pool of IP addresses.
 	 */
-	public ArrayList<IPAddress> getPool() {
-		return pool;
+	public ArrayList<IPAddress> getIpPool() {
+		return ipPool;
+	}
+	
+	/**
+	 * Return the number of IP addresses in the maintained pool by the server.
+	 * 
+	 * @return The number of IP addresses in the pool.
+	 */
+	public int getNumberOfIPAddresses() {
+		return this.getIpPool().size();
 	}
 	
 	/**
@@ -59,9 +68,9 @@ public class IPPool {
 	 *         There is no IP address available.
 	 */
 	public InetAddress getAvailableAddress() throws Exception {
-		for(int i=0; i<getPool().size(); i++){
-			if(!getPool().get(i).isLeased())
-					return getPool().get(i).getIpAddress();
+		for(int i=0; i<getIpPool().size(); i++){
+			if(!getIpPool().get(i).isLeased())
+					return getIpPool().get(i).getIpAddress();
 		}
 		throw new Exception("There are currently no IP addresses available.");
 	}
@@ -75,8 +84,8 @@ public class IPPool {
 	 * @return True if the IP is in the pool and is not yet in use.
 	 */
 	public boolean isInPoolAndAvailable(InetAddress ip){
-		for(int i =0; i<getPool().size(); i++){
-			if(getPool().get(i).getIpAddress().equals(ip) && !getPool().get(i).isLeased())
+		for(int i =0; i<getIpPool().size(); i++){
+			if(getIpPool().get(i).getIpAddress().equals(ip) && !getIpPool().get(i).isLeased())
 				return true;
 		}
 		return false;
@@ -91,9 +100,9 @@ public class IPPool {
 	 * @return The IPAddress if it is present in the pool, else null.
 	 */
 	public IPAddress getIPFromPool(InetAddress address){
-		for(int i=0; i<getPool().size(); i++){
-			if(getPool().get(i).getIpAddress().equals(address))
-				return getPool().get(i);
+		for(int i=0; i<getIpPool().size(); i++){
+			if(getIpPool().get(i).getIpAddress().equals(address))
+				return getIpPool().get(i);
 		}
 		return null;
 	}
@@ -109,10 +118,37 @@ public class IPPool {
 	 * 		   The given MAC address has no active lease.
 	 */
 	public IPAddress getIPByMacAddress(String macAddress){
-		for(int i=0; i<getPool().size(); i++){
-			if(getPool().get(i).getMacAddress().equals(macAddress))
-				return getPool().get(i);
+		for(int i=0; i<getIpPool().size(); i++){
+			if(getIpPool().get(i).getMacAddress().equals(macAddress))
+				return getIpPool().get(i);
 		}
 		throw new IllegalArgumentException("The given MAC address has no active lease.");
+	}
+	
+	/**
+	 * Checks all IP's in the pool for expired leases and changes the lease status if necessary.
+	 */
+	public void checkPoolLeases(){
+		for(int i=0; i<this.getNumberOfIPAddresses(); i++){
+			if((getIpPool().get(i).getLeaseExpirationTime() < System.currentTimeMillis()) && this.getIpPool().get(i).isLeased()){
+				getIpPool().get(i).setLeased(false);
+				System.out.println("Lease of client with MAC address " + this.getIpPool().get(i).getMacAddress() + " has expired.");
+			}
+		}
+	}
+	
+	/**
+	 * Return all leased addresses.
+	 * 
+	 * @return A list of leased IP addresses.
+	 */
+	public ArrayList<IPAddress> returnLeasedAddresses() {
+		ArrayList<IPAddress> leasedAddresses = new ArrayList<IPAddress>();
+		for(int i=0; i<this.getNumberOfIPAddresses(); i++) {
+			IPAddress currentIP = getIpPool().get(i);
+			if(currentIP.isLeased())
+				leasedAddresses.add(currentIP);
+		}
+		return leasedAddresses;
 	}
 }
