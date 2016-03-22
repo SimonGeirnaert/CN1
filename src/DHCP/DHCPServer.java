@@ -2,6 +2,7 @@ package DHCP;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 
 import DHCP.Message.DHCPAckMessage;
 import DHCP.Message.DHCPNakMessage;
@@ -27,6 +28,8 @@ public class DHCPServer extends DHCPHost implements Runnable {
 	private InetAddress serverIP = null;
 
 	/**
+	 * Return the IP address of the DHCP server.
+	 * 
 	 * @return The server IP address.
 	 */
 	public InetAddress getServerIP() {
@@ -111,14 +114,15 @@ public class DHCPServer extends DHCPHost implements Runnable {
 	 **********************************************************/
 
 	/**
-	 * Initialize a new DHCP server.
+	 * Initialize a new DHCP server and starts two threads:
+	 * an operation thread and a pool control thread.
 	 * 
 	 * @param serverIP
 	 *        The IP at which the server can be reached.
 	 * @param leaseTime
 	 * 		  The lease time (in seconds).
 	 */
-	public DHCPServer(InetAddress serverIP, int leaseTime) throws UnknownHostException{
+	public DHCPServer(InetAddress serverIP, int leaseTime) throws UnknownHostException {
 		setServerIP(serverIP);
 		setLeaseTime(leaseTime);
 		this.pool = new IPPool(POOL_IP_PREFIX, IP_FIRST, IP_LAST);
@@ -142,6 +146,7 @@ public class DHCPServer extends DHCPHost implements Runnable {
 		Message incomingMessage = Message.convertToMessage(rcvd.getData());
 		server.setDestinationPort(rcvd.getPort());
 		
+		
 		handleResponse(incomingMessage, server, socket);
 		
 		socket.close();
@@ -149,7 +154,20 @@ public class DHCPServer extends DHCPHost implements Runnable {
 	}
 	
 	/**
-	 * Runs the normal operation of the server in a seperate thread. Implements the Runnable inerface.
+	 * Print out all leased IP addresses and the associated MAC addresses.
+	 */
+	public void printLeasedAddresses() {
+		ArrayList<IPAddress> leasedAddresses = this.getPool().returnLeasedAddresses();
+		System.out.println("-----");
+		System.out.println("List of leased IP addresses");
+		for(IPAddress ip: leasedAddresses) {
+			System.out.println("IP address: " + ip.getIpAddress() + "; associated MAC address: " + ip.getMacAddress());
+		}
+		System.out.println("-----");
+	}
+
+	/**
+	 * Runs the normal operation of the server in a separate thread. Implements the Runnable interface.
 	 */
 	public void run() {
 		try {
@@ -170,7 +188,7 @@ public class DHCPServer extends DHCPHost implements Runnable {
 	 * 		  The bidirectional connection socket;
 	 */
 	private void handleResponse(Message response, UDPHost server, DatagramSocket socket) throws Exception{
-		try{
+		try {
 			// DHCPDiscover received
 			if(Utilities.convertToInt(response.getOptions().getOption(53).getContents()) == 1) {
 				System.out.println("DHCPDISCOVER received.");
@@ -189,33 +207,41 @@ public class DHCPServer extends DHCPHost implements Runnable {
 				}
 			}
 			// DHCPRequest received
-			else if(Utilities.convertToInt(response.getOptions().getOption(53).getContents()) == 3){
+			else if(Utilities.convertToInt(response.getOptions().getOption(53).getContents()) == 3) {
 				System.out.println("DHCPREQUEST received.");
 				InetAddress offeredIP = InetAddress.getByAddress(response.getOptions().getOption(50).getContents());
-				if((getPool().isInPoolAndAvailable(offeredIP) && !getPool().getIPFromPool(offeredIP).isLeased()) || (offeredIP.equals(getPool().getIPByMacAddress(response.getChaddr()).getIpAddress()))){
-					getPool().getIPFromPool(offeredIP).setLeaseExpired(System.currentTimeMillis()+getLeaseTime()*1000);
+				if(getPool().isInPoolAndAvailable(offeredIP) || (offeredIP.equals(getPool().getIPByMacAddress(response.getChaddr()).getIpAddress()))){
+					getPool().getIPFromPool(offeredIP).setLeaseExpirationTime(System.currentTimeMillis() + getLeaseTime()*1000);
 					getPool().getIPFromPool(offeredIP).setLeased(true);
 					getPool().getIPFromPool(offeredIP).setMacAddress(response.getChaddr());
 					DHCPAck(response.getXid(), InetAddress.getByAddress(response.getOptions().getOption(50).getContents()), response.getChaddr(), server, socket);
+					this.printLeasedAddresses();
 					socket.close();
 					operate();
 				}
-				else{
+				else {
 					DHCPNak(response.getXid(), response.getChaddr(), server, socket);
 					socket.close();
 					operate();
 				}
 			}
+			else {
+				System.out.println("Unknown message received. Ignoring message and resuming normal operation.");
+				socket.close();
+				operate();
+			}
+		// No options, so illegal argument exception: release
 		} catch (IllegalArgumentException e) {
 			if(response.getYiaddr().equals(InetAddress.getByName("0.0.0.0"))) {		
 				System.out.println("DHCPRELEASE received.");
-				getPool().getIPByMacAddress(response.getChaddr()).setLeased(false); //dont remove MAC addr from pool to make quick initialization possible
-				getPool().getIPByMacAddress(response.getChaddr()).setLeaseExpired(System.currentTimeMillis());
+				getPool().getIPByMacAddress(response.getChaddr()).setLeased(false); //don't remove MAC addr from pool to make quick initialization possible
+				getPool().getIPByMacAddress(response.getChaddr()).setLeaseExpirationTime(0);
+				this.printLeasedAddresses();
 				socket.close();
 				operate();
 			}
 		
-			else{
+			else {
 				System.out.println("Unknown message received. Ignoring message and resuming normal operation.");
 				socket.close();
 				operate();
@@ -278,24 +304,12 @@ public class DHCPServer extends DHCPHost implements Runnable {
 	}
 
 	/**
-	 * Checks all IP's in the pool for expired leases and changes the lease status if necessary.
-	 */
-	public void checkPoolLeases(){
-		for(int i=0; i<getPool().getPool().size(); i++){
-			if((getPool().getPool().get(i).getLeaseExpired() < System.currentTimeMillis()) && getPool().getPool().get(i).isLeased()){
-				getPool().getPool().get(i).setLeased(false);
-				System.out.println("Lease of client with MAC address " + getPool().getPool().get(i).getMacAddress() +" has expired.");
-			}
-		}
-	}
-
-	/**
 	 * Inner class defined to check the pool.
 	 */
 	private class PoolControl implements Runnable {
 		public void run(){
 			while(true){
-				checkPoolLeases();
+				getPool().checkPoolLeases();
 			}
 		}
 	}
