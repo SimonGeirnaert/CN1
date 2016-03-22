@@ -35,6 +35,8 @@ public class DHCPServer extends DHCPHost implements Runnable {
 		this.pool = new IPPool(POOL_IP_PREFIX, IP_FIRST, IP_LAST);
 		Thread thread = new Thread(this);
 		thread.start();
+		Thread threadPoolControl = new Thread(new PoolControl());
+		threadPoolControl.start();
 	}
 	
 	/**********************************************************
@@ -147,6 +149,17 @@ public class DHCPServer extends DHCPHost implements Runnable {
 	}
 	
 	/**
+	 * Runs the normal operation of the server in a seperate thread. Implements the Runnable inerface.
+	 */
+	public void run() {
+		try {
+			operate();
+		} catch (Exception e) {
+			System.out.println("Error occured in operation");
+		}
+	}
+
+	/**
 	 * Handle a response of the client and return normal operation.
 	 * 
 	 * @param response
@@ -210,6 +223,9 @@ public class DHCPServer extends DHCPHost implements Runnable {
 		}
 	}
 	
+	/**
+	 * Constant used to compensate search time.
+	 */
 	private static final double PORTION_TIME_WAITING = 0.5;
 	
 	/**
@@ -245,6 +261,46 @@ public class DHCPServer extends DHCPHost implements Runnable {
 	}
 	
 	/**
+	 * Check whether a client has already an IP address in use.
+	 * 
+	 * @param macAddress
+	 * 	 	  The MAC address of the client to check.
+	 * @return True if the client has already an IP address in use;
+	 * 		   false otherwise.
+	 */
+	private boolean clientHasAlreadyIP(String macAddress) {
+		try {
+			this.getPool().getIPByMacAddress(macAddress);
+			return true;
+		} catch(IllegalArgumentException e) {
+			return false;
+		}
+	}
+
+	/**
+	 * Checks all IP's in the pool for expired leases and changes the lease status if necessary.
+	 */
+	public void checkPoolLeases(){
+		for(int i=0; i<getPool().getPool().size(); i++){
+			if((getPool().getPool().get(i).getLeaseExpired() < System.currentTimeMillis()) && getPool().getPool().get(i).isLeased()){
+				getPool().getPool().get(i).setLeased(false);
+				System.out.println("Lease of client with MAC address " + getPool().getPool().get(i).getMacAddress() +" has expired.");
+			}
+		}
+	}
+
+	/**
+	 * Inner class defined to check the pool.
+	 */
+	private class PoolControl implements Runnable {
+		public void run(){
+			while(true){
+				checkPoolLeases();
+			}
+		}
+	}
+
+	/**
 	 * Creates and sends a DHCPOFFER message and returns the response.
 	 * 
 	 * @param xid
@@ -269,7 +325,7 @@ public class DHCPServer extends DHCPHost implements Runnable {
 		Message response = sendUDPMessage(offerMessage, server, socket);
 		return response;
 	}
-	
+
 	/**
 	 * Sends a DHCPACK message to the client to confirm that 
 	 * the IP address is now leased to the client.
@@ -290,7 +346,7 @@ public class DHCPServer extends DHCPHost implements Runnable {
 		System.out.println("DHCPACK sent.");
 		sendUDPMessageWithoutResponse(ackMessage, server, socket);
 	}
-	
+
 	/**
 	 * Sends a DHCPNAK message to the client to state that the IP address offered can not be leased.
 	 * 
@@ -307,45 +363,5 @@ public class DHCPServer extends DHCPHost implements Runnable {
 		DHCPNakMessage nakMessage = new DHCPNakMessage(xid, macAddress);
 		System.out.println("DHCPNAK sent.");
 		sendUDPMessageWithoutResponse(nakMessage, server, socket);
-	}
-	
-	/**
-	 * Check whether a client has already an IP address in use.
-	 * 
-	 * @param macAddress
-	 * 	 	  The MAC address of the client to check.
-	 * @return True if the client has already an IP address in use;
-	 * 		   false otherwise.
-	 */
-	private boolean clientHasAlreadyIP(String macAddress) {
-		try {
-			this.getPool().getIPByMacAddress(macAddress);
-			return true;
-		} catch(IllegalArgumentException e) {
-			return false;
-		}
-	}
-
-	/**
-	 * 
-	 */
-	public void run() {
-		try {
-			operate();
-		} catch (Exception e) {
-			System.out.println("Error occured in operation");
-		}
-	}
-	
-	/**
-	 * 
-	 */
-	public void checkPoolLeases(){
-		for(int i=0; i<getPool().getPool().size(); i++){
-			if((getPool().getPool().get(i).getLeaseExpired() < System.currentTimeMillis()) && getPool().getPool().get(i).isLeased()){
-				getPool().getPool().get(i).setLeased(false);
-				System.out.println("Lease of client with MAC address " + getPool().getPool().get(i).getMacAddress() +" has expired.");
-			}
-		}
 	}
 }
