@@ -34,3 +34,4 @@ Algemeen voor setters en constructoren: eens kijken naar precondities?
 Wat als de lease time al voorbij is en de server krijgt geen nieuwe request?
 
 		
+Ipv threading, gewoon starttijdstip bijhouden en zo leasetijd uitrekenen? En dan periodisch pool overlopen? niet ideaal maar beter dan niets…
