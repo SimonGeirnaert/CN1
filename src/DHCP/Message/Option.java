@@ -14,13 +14,49 @@ public class Option {
 	/**
 	 * Variable representing the option code.
 	 */
-	int optionCode = 0;
+	private int optionCode = 0;
 	
+	/**
+	 * Return the option code of the option.
+	 * 
+	 * @return The code identifying the option.
+	 */
+	public int getOptionCode() {
+		return optionCode;
+	}
+
+	/**
+	 * Sets the code identifying the option.
+	 * 
+	 * @param optionCode 
+	 * 		  The option code to set.
+	 */
+	 void setOptionCode(int optionCode) {
+		this.optionCode = optionCode;
+	}
+
 	/**
 	 * Variable representing the content of the option.
 	 */
-	byte[] contents = null;
+	private byte[] contents = null;
 	
+	/**
+	 * @return The contents of the option.
+	 */
+	public byte[] getContents() {
+		return contents;
+	}
+
+	/**
+	 * Sets the contents of the option to a given byte array.
+	 * 
+	 * @param contents 
+	 * 		  The contents to set for the option.
+	 */
+	 void setContents(byte[] contents) {
+		this.contents = contents;
+	}
+
 	/**
 	 * Represents an option of a DHCP message.
 	 * 
@@ -61,49 +97,12 @@ public class Option {
 	}
 	
 	/**
-	 * Return the option code of the option.
-	 * 
-	 * @return The code identifying the option.
-	 */
-	public int getOptionCode() {
-		return optionCode;
-	}
-
-	/**
-	 * Sets the code identifying the option.
-	 * 
-	 * @param optionCode 
-	 * 		  The option code to set.
-	 */
-	public void setOptionCode(int optionCode) {
-		this.optionCode = optionCode;
-	}
-
-	/**
 	 * Return the length of the content of the option.
 	 * 
 	 * @return The length of the contents of the option.
 	 */
 	public int getLengthContent() {
 		return getContents().length;
-	}
-
-
-	/**
-	 * @return The contents of the option.
-	 */
-	public byte[] getContents() {
-		return contents;
-	}
-
-	/**
-	 * Sets the contents of the option to a given byte array.
-	 * 
-	 * @param contents 
-	 * 		  The contents to set for the option.
-	 */
-	public void setContents(byte[] contents) {
-		this.contents = contents;
 	}
 	
 	

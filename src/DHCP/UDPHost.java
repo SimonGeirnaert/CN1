@@ -69,7 +69,7 @@ public class UDPHost {
 	 * @param destinationPort
 	 *        The port to set.
 	 */
-	public void setDestinationPort(int destinationPort) {
+	 void setDestinationPort(int destinationPort) {
 		this.destinationPort = destinationPort;
 	}
 

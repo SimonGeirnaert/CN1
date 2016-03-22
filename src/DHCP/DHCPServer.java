@@ -18,35 +18,13 @@ import DHCP.Message.Message;
 public class DHCPServer extends DHCPHost implements Runnable {
 	
 	/**********************************************************
-	 * Constructor
-	 **********************************************************/
-
-	/**
-	 * Initialize a new DHCP server.
-	 * 
-	 * @param serverIP
-	 *        The IP at which the server can be reached.
-	 * @param leaseTime
-	 * 		  The lease time (in seconds).
-	 */
-	public DHCPServer(InetAddress serverIP, int leaseTime) throws UnknownHostException{
-		setServerIP(serverIP);
-		setLeaseTime(leaseTime);
-		this.pool = new IPPool(POOL_IP_PREFIX, IP_FIRST, IP_LAST);
-		Thread thread = new Thread(this);
-		thread.start();
-		Thread threadPoolControl = new Thread(new PoolControl());
-		threadPoolControl.start();
-	}
-	
-	/**********************************************************
 	 * Server IP
 	 **********************************************************/
 	
 	/**
 	 * Variable representing the IP of the server.
 	 */
-	InetAddress serverIP = null;
+	private InetAddress serverIP = null;
 
 	/**
 	 * @return The server IP address.
@@ -102,7 +80,7 @@ public class DHCPServer extends DHCPHost implements Runnable {
 	/**
 	 * Variable representing the pool of IP addresses the server can issue.
 	 */
-	IPPool pool = null;
+	private IPPool pool = null;
 	
 	/**
 	 * Constant representing the first part of all pool IP addresses.
@@ -126,6 +104,28 @@ public class DHCPServer extends DHCPHost implements Runnable {
 	 */
 	public IPPool getPool() {
 		return pool;
+	}
+	
+	/**********************************************************
+	 * Constructor
+	 **********************************************************/
+
+	/**
+	 * Initialize a new DHCP server.
+	 * 
+	 * @param serverIP
+	 *        The IP at which the server can be reached.
+	 * @param leaseTime
+	 * 		  The lease time (in seconds).
+	 */
+	public DHCPServer(InetAddress serverIP, int leaseTime) throws UnknownHostException{
+		setServerIP(serverIP);
+		setLeaseTime(leaseTime);
+		this.pool = new IPPool(POOL_IP_PREFIX, IP_FIRST, IP_LAST);
+		Thread thread = new Thread(this);
+		thread.start();
+		Thread threadPoolControl = new Thread(new PoolControl());
+		threadPoolControl.start();
 	}
 	
 	/**********************************************************

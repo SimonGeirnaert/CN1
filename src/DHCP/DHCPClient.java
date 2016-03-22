@@ -98,6 +98,7 @@ public class DHCPClient extends DHCPHost {
 	public void getIP() throws IllegalArgumentException, SocketException, IOException{
 		// Initialize connection sockets and settings
 		DatagramSocket socket = new DatagramSocket();
+		//UDP client = new UDP(InetAddress.getByName("10.33.14.246"), 1234); //Server KU Leuven
 		UDPHost client = new UDPHost(InetAddress.getByName("localhost"), 1602);
 		
 		// Discover
@@ -122,7 +123,6 @@ public class DHCPClient extends DHCPHost {
 			setCiaddr(acknowledge.getYiaddr());
 			System.out.println("SYSTEM IP SET TO " + getCiaddr().toString());
 			int leaseTime = Utilities.convertToInt(acknowledge.getOptions().getOption(51).getContents());
-			//int leaseTime = 10; //to simulate lease time of 10 seconds
 			System.out.println("- Lease time: " + leaseTime + " seconds.");
 			socket.close();
 			long timeBeginLease = System.currentTimeMillis();
@@ -145,7 +145,7 @@ public class DHCPClient extends DHCPHost {
 	 */
 	public void releaseIP() throws UnknownHostException, IOException {
 		DatagramSocket socket = new DatagramSocket();
-		//UDP client = new UDP(InetAddress.getByName("10.33.14.246"), 1234);
+		//UDPHost client = new UDP(InetAddress.getByName("10.33.14.246"), 1234); //Server KU Leuven
 		UDPHost client = new UDPHost(InetAddress.getByName("localhost"), 1602);
 		
 		DHCPRelease(client, socket);
@@ -163,7 +163,7 @@ public class DHCPClient extends DHCPHost {
 	public void renewLease(InetAddress siaddr) throws SocketException, IOException{
 		System.out.println("LEASE RENEWAL STARTED.");
 		DatagramSocket socket = new DatagramSocket();
-		//UDP client = new UDP(InetAddress.getByName("10.33.14.246"), 1234);
+		//UDP client = new UDP(InetAddress.getByName("10.33.14.246"), 1234); //Server KU Leuven
 		UDPHost client = new UDPHost(InetAddress.getByName("localhost"), 1602);
 		
 		Message ack = DHCPRequest(Utilities.generateXid(), getCiaddr(), siaddr, client, socket);

@@ -38,7 +38,7 @@ public class ReceivedData {
 	 * @param data
 	 *        The data to set.
 	 */
-	public void setData(byte[] data) {
+	void setData(byte[] data) {
 		this.data = data;
 	}
 
@@ -60,7 +60,7 @@ public class ReceivedData {
 	 * @param port
 	 *        The port to set.
 	 */
-	public void setPort(int port) {
+	void setPort(int port) {
 		this.port = port;
 	}
 

@@ -62,7 +62,7 @@ public class IPAddress {
 	 * @param leased
 	 *        The leased status to set.
 	 */
-	public void setLeased(boolean leased) {
+	void setLeased(boolean leased) {
 		this.leased = leased;
 	}
 
@@ -84,18 +84,29 @@ public class IPAddress {
 	 * @param macAddress
      *        The hardware address to set.
 	 */
-	public void setMacAddress(String macAddress) {
+	void setMacAddress(String macAddress) {
 		this.macAddress = macAddress;
 	}
 	
-	
-	long leaseExpired = 0;
+	/**
+	 * Variable representing the server time at which the lease of this IP expires.
+	 */
+	private long leaseExpired = 0;
 
+	/**
+	 * @return The server time at which the lease of this IP expires.
+	 */
 	public long getLeaseExpired() {
 		return leaseExpired;
 	}
 
-	public void setLeaseExpired(long leaseExpired) {
+	/**
+	 * Sets the time at which the lease of this IP expires.
+	 * 
+	 * @param leaseExpired
+	 *        The time to set.
+	 */
+	 void setLeaseExpired(long leaseExpired) {
 		this.leaseExpired = leaseExpired;
 	}
 	

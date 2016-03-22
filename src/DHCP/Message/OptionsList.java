@@ -15,7 +15,7 @@ public class OptionsList {
 	/**
 	 * Variable representing a list of options
 	 */
-	Option[] options = null;
+	private Option[] options = null;
 	
 	/**
 	 * Initialize the options list with given options.

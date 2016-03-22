@@ -24,10 +24,16 @@ public class Message {
 	 */
 	protected static final int FLAGS0 = 0;
 	
+	/**
+	 * Variable referencing the size of a message.
+	 */
+	protected static final int MESSAGE_SIZE = 576;
+	
+	
 	/**********************************************************
 	 * Constructor
 	 **********************************************************/
-	
+
 	/**
 	 * Initialize the new message with given opcode, hardware type, hardware address length, number of hops, transactionID, number of seconds, flags, client IP address,
 	 * your IP address, the server IP address, the relay agent IP address, the client hardware address, the server name, the file, and the options.
@@ -82,10 +88,7 @@ public class Message {
 		setOptions(options);
 	}
 	
-	/**
-	 * Variable referencing the size of a message.
-	 */
-	public static final int MESSAGE_SIZE = 576;
+	
 	
 	/**********************************************************
 	 * OpCode
@@ -114,7 +117,7 @@ public class Message {
 	 * @throws IllegalArgumentException
 	 * 		   The opcode is not equal to 1 or 2.
 	 */
-	public void setOp(int op) throws IllegalArgumentException {
+	protected void setOp(int op) throws IllegalArgumentException {
 		if(op < 1 || op > 2) 
 			throw new IllegalArgumentException("The opcode has to be 1 or 2."); 
 		else 
@@ -147,7 +150,7 @@ public class Message {
 	 * @throws IllegalArgumentException
 	 * 		   The htype is specified illegally.
 	 */
-	public void setHtype(int htype) throws IllegalArgumentException {
+	protected void setHtype(int htype) throws IllegalArgumentException {
 		if(htype < 1 || htype > 20 || (htype > 1 && htype < 6) || (htype > 7 && htype < 11) || htype == 13) 
 			throw new IllegalArgumentException("Htype should be specified right");
 		else 
@@ -178,7 +181,7 @@ public class Message {
 	 * @param hlen
 	 * 		  The new hardware address length.
 	 */
-	public void setHlen(int hlen) {
+	protected void setHlen(int hlen) {
 			this.hlen = hlen;
 	}
 	
@@ -206,7 +209,7 @@ public class Message {
 	 * @param hops
 	 * 		  The new number of hops.
 	 */
-	public void setHops(int hops) {
+	protected void setHops(int hops) {
 		this.hops = hops;
 	}
 	
@@ -234,7 +237,7 @@ public class Message {
 	 * @param xid
 	 * 		  The new transaction ID of the message.
 	 */
-	public void setXid(int xid) {
+	protected void setXid(int xid) {
 		this.xid = xid;
 	}
 	
@@ -263,7 +266,7 @@ public class Message {
 	 * @throws IllegalArgumentException
 	 * 		   The number of seconds must be positive.
 	 */
-	public void setSecs(int secs) throws IllegalArgumentException {
+	protected void setSecs(int secs) throws IllegalArgumentException {
 		if(secs < 0) 
 			throw new IllegalArgumentException("Message can't travel back in time: secs must be positive.");
 		else 
@@ -294,7 +297,7 @@ public class Message {
 	 * @param flags
 	 * 		  The new flags of the message
 	 */
-	public void setFlags(int flags) {
+	protected void setFlags(int flags) {
 		this.flags = flags;
 	}
 	
@@ -323,7 +326,7 @@ public class Message {
 	 * @param ciaddr
 	 * 		  The new client IP address.
 	 */
-	public void setCiaddr(InetAddress ciaddr) {
+	protected void setCiaddr(InetAddress ciaddr) {
 		this.ciaddr = ciaddr;
 	}
 	
@@ -352,7 +355,7 @@ public class Message {
 	 * @param yiaddr
 	 * 		  New your IP address
 	 */
-	public void setYiaddr(InetAddress yiaddr) {
+	protected void setYiaddr(InetAddress yiaddr) {
 		this.yiaddr = yiaddr;
 	}
 	
@@ -381,7 +384,7 @@ public class Message {
 	 * @param siaddr
 	 * 		  The new server IP address
 	 */
-	public void setSiaddr(InetAddress siaddr) {
+	protected void setSiaddr(InetAddress siaddr) {
 		this.siaddr = siaddr;
 	}
 	
@@ -410,7 +413,7 @@ public class Message {
 	 * @param giaddr
 	 * 		  The new gateway IP address
 	 */
-	public void setGiaddr(InetAddress giaddr) {
+	protected void setGiaddr(InetAddress giaddr) {
 		this.giaddr = giaddr;
 	}
 	
@@ -440,7 +443,7 @@ public class Message {
 	 * @throws IllegalArgumentException
 	 * 		   The MAC address shoud be 16 bytes
 	 */
-	public void setChaddr(String chaddr) throws IllegalArgumentException {
+	protected void setChaddr(String chaddr) throws IllegalArgumentException {
 		if((chaddr.getBytes().length) != 16) 
 			throw new IllegalArgumentException("MAC address should be 16 bytes."); 
 		else
@@ -471,7 +474,7 @@ public class Message {
 	 * @param sname
 	 * 		  The new server name
 	 */
-	public void setSname(String sname) {
+	protected void setSname(String sname) {
 		this.sname = sname;
 	}
 	
@@ -499,7 +502,7 @@ public class Message {
 	 * @param file
 	 * 		  The new boot file name
 	 */
-	public void setFile(String file) {
+	protected void setFile(String file) {
 		this.file = file;
 	}
 	
@@ -545,7 +548,7 @@ public class Message {
 	 * @param options
 	 * 		  The new options of the message
 	 */
-	public void setOptions(OptionsList options) {
+	protected void setOptions(OptionsList options) {
 		this.options = options;
 	}
 
