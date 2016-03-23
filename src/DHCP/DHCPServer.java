@@ -146,28 +146,7 @@ public class DHCPServer extends DHCPHost implements Runnable {
 		Message incomingMessage = Message.convertToMessage(rcvd.getData());
 		server.setDestinationPort(rcvd.getPort());
 		
-		class HandleResponse implements Runnable {
-			Message incomingMessage;
-			UDPHost server;
-			DatagramSocket socket;
-			HandleResponse(Message incomingMessage, UDPHost server, DatagramSocket socket){
-				this.server = server;
-				this.incomingMessage = incomingMessage;
-				this.socket = socket;
-			}
-			public void run(){
-				try {
-					handleResponse(incomingMessage, server, socket);
-				} catch (Exception e) {
-					System.out.println("Unable to respond accurately to message received. Ignoring message.");
-				}
-			}
-		}
-		
-		Thread thread = new Thread(new HandleResponse(incomingMessage, server, socket));
-		thread.run();
-		
-		//handleResponse(incomingMessage, server, socket);
+		handleResponse(incomingMessage, server, socket);
 		
 		socket.close();
 		operate();
