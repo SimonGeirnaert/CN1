@@ -154,9 +154,11 @@ public class DHCPServer extends DHCPHost implements Runnable {
 	
 	/**
 	 * Print out all leased IP addresses and the associated MAC addresses.
+	 * 
+	 * @param leasedAddresses
+	 * 		  A list of all the leased addresses0
 	 */
-	public void printLeasedAddresses() {
-		ArrayList<IPAddress> leasedAddresses = this.getPool().returnLeasedAddresses();
+	public static void printLeasedAddresses(ArrayList<IPAddress> leasedAddresses) {
 		System.out.println("-----");
 		System.out.println("List of leased IP addresses");
 		for(IPAddress ip: leasedAddresses) {
@@ -184,7 +186,7 @@ public class DHCPServer extends DHCPHost implements Runnable {
 	 * @param server
 	 * 		  The UDP server.
 	 * @param socket
-	 * 		  The bidirectional connection socket;
+	 * 		  The bidirectional connection socket.
 	 */
 	private void handleResponse(Message response, UDPHost server, DatagramSocket socket) throws Exception{
 		try {
@@ -214,7 +216,7 @@ public class DHCPServer extends DHCPHost implements Runnable {
 					getPool().getIPFromPool(offeredIP).setLeased(true);
 					getPool().getIPFromPool(offeredIP).setMacAddress(response.getChaddr());
 					DHCPAck(response.getXid(), InetAddress.getByAddress(response.getOptions().getOption(50).getContents()), response.getChaddr(), server, socket);
-					this.printLeasedAddresses();
+					printLeasedAddresses(this.getPool().returnLeasedAddresses());
 					socket.close();
 					operate();
 				}
@@ -232,10 +234,10 @@ public class DHCPServer extends DHCPHost implements Runnable {
 		// No options, so illegal argument exception: release
 		} catch (IllegalArgumentException e) {
 			if(response.getYiaddr().equals(InetAddress.getByName("0.0.0.0"))) {		
-				System.out.println("DHCPRELEASE received.");
+				System.out.println("DHCPRELEASE received by " + response.getChaddr() + ".");
 				getPool().getIPByMacAddress(response.getChaddr()).setLeased(false); //don't remove MAC addr from pool to make quick initialization possible
 				getPool().getIPByMacAddress(response.getChaddr()).setLeaseExpirationTime(0);
-				this.printLeasedAddresses();
+				printLeasedAddresses(this.getPool().returnLeasedAddresses());
 				socket.close();
 				operate();
 			}

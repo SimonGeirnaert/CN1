@@ -66,6 +66,9 @@ public class Option {
 	 * 		  The code identifying the option.
 	 * @param contents 
 	 * 		  The contents of the option.
+	 * 
+	 * @post  The option code is set to the given option code.
+	 * @post  The content of the options is set to the given content.
 	 */
 	public Option(int optionCode, byte[] contents){
 		setOptionCode(optionCode);
@@ -94,7 +97,7 @@ public class Option {
 	 * @return The option that starts at index.
 	 */
 	public static Option returnOptionAtIndex(byte[] array, int index){
-		Option result = new Option(array[index], Utilities.getPartArray(index+2, index+1+array[index+1], array));
+		Option result = new Option(array[index], Utilities.getPartArray(index + 2, index + 1 + array[index + 1], array));
 		return result;
 	}
 	

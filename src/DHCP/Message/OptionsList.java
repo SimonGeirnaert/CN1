@@ -68,7 +68,8 @@ public class OptionsList {
 	/**
 	 * Adds a given option to the options list.
 	 * 
-	 * @param option The option to add.
+	 * @param option 
+	 * 		  The option to add.
 	 */
 	private void addOption(Option option){
 		Option[] newList = new Option[getOptions().length+1];
@@ -101,7 +102,7 @@ public class OptionsList {
 	 * 
 	 * @return The options of the options list.
 	 */
-	public Option[] getOptions() {
+	private Option[] getOptions() {
 		return options;
 	}
 

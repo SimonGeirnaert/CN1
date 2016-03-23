@@ -133,6 +133,7 @@ public class IPPool {
 			if((getIpPool().get(i).getLeaseExpirationTime() < System.currentTimeMillis()) && this.getIpPool().get(i).isLeased()){
 				getIpPool().get(i).setLeased(false);
 				System.out.println("Lease of client with MAC address " + this.getIpPool().get(i).getMacAddress() + " has expired.");
+				DHCPServer.printLeasedAddresses(returnLeasedAddresses());
 			}
 		}
 	}

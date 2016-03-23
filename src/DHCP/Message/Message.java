@@ -305,7 +305,6 @@ public class Message {
 	/**
 	 * Variable referencing the client IP address of the message.
 	 */
-	//private InetAddress ciaddr = InetAddress.getByName("0.0.0.0");
 	private InetAddress ciaddr = null;
 	
 	/**
@@ -334,7 +333,6 @@ public class Message {
 	/**
 	 * Variable referencing your IP address of the message.
 	 */
-	//private InetAddress yiaddr = InetAddress.getByName("0.0.0.0");
 	private InetAddress yiaddr = null;
 	
 	/**
@@ -363,7 +361,6 @@ public class Message {
 	/**
 	 * Variable referencing the server IP address of the message.
 	 */
-	//private InetAddress siaddr = InetAddress.getByName("0.0.0.0");
 	private InetAddress siaddr = null;
 	
 	/**
@@ -392,7 +389,6 @@ public class Message {
 	/**
 	 * Variable referencing the gateway IP address of the message.
 	 */
-	//private InetAddress giaddr = InetAddress.getByName("0.0.0.0");
 	private InetAddress giaddr = null;
 	
 	/**
@@ -568,7 +564,6 @@ public class Message {
 		byteArray = Utilities.insertSubArrayInArrayAt(getSiaddr().getAddress(), byteArray, 20);
 		byteArray = Utilities.insertSubArrayInArrayAt(getGiaddr().getAddress(), byteArray, 24);
 		byteArray = Utilities.insertSubArrayInArrayAt(getChaddr().getBytes(), byteArray, 28);
-		//byteArray = Utilities.insertSubArrayInArrayAt(new byte[16], byteArray, 44);
 		byteArray = Utilities.insertSubArrayInArrayAt(getSname().getBytes(), byteArray, 44);
 		byteArray = Utilities.insertSubArrayInArrayAt(getFile().getBytes(), byteArray, 108);
 		byteArray = Utilities.insertSubArrayInArrayAt(getCookie(), byteArray, 236);
